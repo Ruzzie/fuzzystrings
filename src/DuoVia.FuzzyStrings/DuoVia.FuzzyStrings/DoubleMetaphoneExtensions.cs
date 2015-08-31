@@ -42,7 +42,15 @@ namespace DuoVia.FuzzyStrings
     /// </remarks>
     public static class DoubleMetaphoneExtensions
     {
+        static readonly RingLikeCacheWithFixedSize<string,string> MethaphoneFixedRingCache =new RingLikeCacheWithFixedSize<string, string>(StringComparer.OrdinalIgnoreCase, 5000);
+
+
         public static string ToDoubleMetaphone(this string input)
+        {
+            return MethaphoneFixedRingCache.GetOrAdd(input, key => key.ToDoubleMetaphoneUncached());
+        }
+
+        public static string ToDoubleMetaphoneUncached(this string input)
         {
             MetaphoneData metaphoneData = new MetaphoneData();
             int current = 0;
@@ -1129,9 +1137,9 @@ namespace DuoVia.FuzzyStrings
 
         static bool StartsWith(this string self, StringComparison comparison, params string[] strings)
         {
-            foreach (string str in strings)
-            {
-                if (self.StartsWith(str, comparison))
+            for (int i = 0; i < strings.Length; i++)
+            {                
+                if (self.StartsWith(strings[i], comparison))
                 {
                     return true;
                 }
@@ -1146,16 +1154,15 @@ namespace DuoVia.FuzzyStrings
                 startIndex = 0;
             }
 
-            foreach (string str in strings)
-            {
-                if (self.IndexOf(str, startIndex, StringComparison.OrdinalIgnoreCase) >= startIndex)
+            for (int i = 0; i < strings.Length; i++)
+            {              
+                if (self.IndexOf(strings[i], startIndex, StringComparison.OrdinalIgnoreCase) >= startIndex)
                 {
                     return true;
                 }
             }
             return false;
-        }
-
+        }       
 
         private class MetaphoneData
         {
