@@ -68,7 +68,24 @@ namespace fuzzytest
         [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", 22)]
         public void LevenshteinTests(string input, string compareTo, int expected)
         {
-            Assert.That(input.LevenshteinDistance(compareTo), Is.EqualTo(expected));
+            Assert.That(input.LevenshteinDistanceUncached(compareTo), Is.EqualTo(expected));
+        }
+
+        [TestCase("beast of burden's power and toughness are each equal to the number of creatures on the battlefield", "Beast of Burden","", "'s power and toughness are each equal to the number of creatures on the battlefield")]
+        [TestCase("battlefield", "B","C", "Cattlefield")]
+        public void ReplaceStringTests(string input, string replace, string replaceWith, string expected)
+        {
+            Assert.That(input.ToLowerInvariant().Replace(replace.ToLowerInvariant(),replaceWith),Is.EqualTo(expected));
+        }
+
+        [TestCase("{B}{G}", "B", true)]
+        [TestCase("{G}", "G", true)]
+        [TestCase("{G}", "B", false)]
+        [TestCase("", "B", false)]
+        [TestCase("", "", true)]
+        public void AnyStringTests(string input, string stringToFind, bool expectedResult)
+        {
+            Assert.That(input.AnyString(stringToFind), Is.EqualTo(expectedResult));
         }
 
         [TestCase("Jensn", "ANSN")]

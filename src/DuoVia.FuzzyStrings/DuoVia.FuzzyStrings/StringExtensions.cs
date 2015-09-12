@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
 
 namespace DuoVia.FuzzyStrings
 {
     public static class StringExtensions
     {
+        private static readonly ConcurrentDictionary<string, double> FuzzyMatchFixedRingCache =
+            new ConcurrentDictionary<string, double>(256,18000*4,/*InternalVariables.DefaultCacheItemSize, 120, false*/ StringComparer.OrdinalIgnoreCase);
+
         private const string Space = " ";
         private static readonly Regex StripRegex = new Regex(@"[^a-zA-Z0-9 -]*");
 
@@ -16,9 +21,15 @@ namespace DuoVia.FuzzyStrings
 
         public static double FuzzyMatch(this string strA, string strB)
         {
+            //return strA.FuzzyMatchUncached(strB);
+            return FuzzyMatchFixedRingCache.GetOrAdd(strA + strB, key => strA.FuzzyMatchUncached(strB));
+        }
+
+        public static double FuzzyMatchUncached(this string strA, string strB)
+        {
             string localA = Strip(strA.Trim().ToLower());
             string localB = Strip(strB.Trim().ToLower());
-            if (localA.ContainsCustom(Space) && localB.ContainsCustom(Space))
+            if (localA.ContainsStringWitCasing(Space) && localB.ContainsStringWitCasing(Space))
             {
                 var partsA = localA.Split(' ');
                 var partsB = localB.Split(' ');
@@ -48,17 +59,30 @@ namespace DuoVia.FuzzyStrings
 
         private static string Strip(string str)
         {
-            return StripRegex.Replace(str, string.Empty);
+            return StripRegex.Replace(str, String.Empty);
         }
 
-        public static bool ContainsCustom(this string inputString, string value)
+        public static bool ContainsStringWitCasing(this string inputString, string value, bool caseInsensitive = false)
         {
-            string input = inputString;
-            string stringToFind = value;
+            string input = (caseInsensitive ? inputString.ToLowerInvariant() : inputString);
+            string stringToFind = (caseInsensitive ? value.ToLowerInvariant() : value);
 
-            return ((input.Length - input.Replace(stringToFind, string.Empty).Length) / stringToFind.Length > 0 ? true : false);
-
+            return ContainsString(input, stringToFind);
         }
+
+        public static bool ContainsString(this string input, string stringToFind)
+        {
+            return input.Contains(stringToFind);
+           // return input.IndexOf(stringToFind, comparison) != -1; //input.Contains(stringToFind);
+           // return ((input.Length - input.ReplaceString(stringToFind, String.Empty).Length)/stringToFind.Length > 0);
+        }
+
+        public static bool AnyString(this string input, string stringToFind, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        {
+             return input.IndexOf(stringToFind,0, comparison) != -1; //input.Contains(stringToFind);
+            // return ((input.Length - input.ReplaceString(stringToFind, String.Empty).Length)/stringToFind.Length > 0);
+        }
+
         private static double CompositeCoefficient(string strA, string strB)
         {
             double dice = strA.DiceCoefficient(strB);
@@ -88,5 +112,6 @@ namespace DuoVia.FuzzyStrings
             double levenCoefficient = 1.0 / (1.0 * (leven + 0.2));
             return levenCoefficient;
         }
+       
     }
 }

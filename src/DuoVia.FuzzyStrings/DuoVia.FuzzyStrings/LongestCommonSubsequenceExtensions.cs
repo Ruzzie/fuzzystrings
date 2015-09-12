@@ -3,11 +3,18 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using System;
+using System.Collections.Concurrent;
 
 namespace DuoVia.FuzzyStrings
 {
     public static class LongestCommonSubsequenceExtensions
     {
+        static readonly ConcurrentDictionary<string, Tuple<string, double>> Cache = new ConcurrentDictionary<string, Tuple<string, double>>(256,18000*4,StringComparer.OrdinalIgnoreCase);
+
+        public static Tuple<string, double> LongestCommonSubsequence(this string input, string comparedTo)
+        {
+            return Cache.GetOrAdd(input + comparedTo, key => input.LongestCommonSubsequenceUncached(comparedTo));
+        }
         /// <summary>
         ///     Longest Common Subsequence. A good value is greater than 0.33.
         /// </summary>
@@ -15,7 +22,7 @@ namespace DuoVia.FuzzyStrings
         /// <param name="comparedTo"></param>
         /// <param name="caseSensitive"></param>
         /// <returns>Returns a Tuple of the sub sequence string and the match coeficient.</returns>
-        public static Tuple<string, double> LongestCommonSubsequence(this string input, string comparedTo, bool caseSensitive = false)
+        public static Tuple<string, double> LongestCommonSubsequenceUncached(this string input, string comparedTo, bool caseSensitive = false)
         {
             if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
             {
