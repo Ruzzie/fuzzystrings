@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DuoVia.FuzzyStrings</RootNamespace>
     <AssemblyName>DuoVia.FuzzyStrings</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -72,6 +72,15 @@
     <CodeAnalysisRuleSet>DuoVia.FuzzyStrings.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Ruzzie.Caching, Version=0.12.92.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\deckcardbuilder\source\MtgDeckCardGenerator\packages\Ruzzie.Cache.FlashCache.0.12.92\lib\net461\Ruzzie.Caching.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ruzzie.Common, Version=0.7.28.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\deckcardbuilder\source\MtgDeckCardGenerator\packages\Ruzzie.Common.0.7.28\lib\net461\Ruzzie.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
@@ -89,7 +98,6 @@
     <Compile Include="LevenshteinDistanceExtensions.cs" />
     <Compile Include="LongestCommonSubsequenceExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MemoryCacheWithItemLimit.cs" />
     <Compile Include="StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DuoVia.FuzzyStrings.ruleset" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

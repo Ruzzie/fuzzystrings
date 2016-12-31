@@ -3,14 +3,19 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using System;
-using System.Collections.Concurrent;
-using System.Linq;
+using System.Collections.Generic;
+using Ruzzie.Caching;
 
 namespace DuoVia.FuzzyStrings
 {
     public static class DiceCoefficientExtensions
     {
-        static readonly ConcurrentDictionary<string, double> Cache = new ConcurrentDictionary<string, double>(256, 18000*4,StringComparer.OrdinalIgnoreCase);
+        private static readonly IFixedSizeCache<string, string[]> BiGramsCache = new FlashCache<string, string[]>(
+            InternalVariables.DefaultCacheItemSizeInMb * 4,
+            InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes, InternalVariables.AverageStringSizeInBytes + 2);
+
+        private static readonly IFixedSizeCache<string, HashSet<string>> BiGramsAltCache = new FlashCache<string, HashSet<string>>(InternalVariables.DefaultCacheItemSizeInMb * 4,
+          InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes, InternalVariables.AverageStringSizeInBytes + 2);
 
         private const string SinglePercent = "%";
         private const string SinglePound = "#";
@@ -19,14 +24,50 @@ namespace DuoVia.FuzzyStrings
 
         public static double DiceCoefficient(this string input, string comparedTo)
         {
-            return Cache.GetOrAdd(input + comparedTo, key => input.DiceCoefficientUncached(comparedTo));
+            var compareToNgrams = BiGramsAltCache.GetOrAdd(comparedTo, key => comparedTo.ToUniqueBiGrams());
+            var ngrams = BiGramsCache.GetOrAdd(input, key => input.ToBiGrams());
+            
+
+            //var ngrams = input.ToBiGrams();
+            //var compareToNgrams = comparedTo.ToUniqueBiGrams();
+            return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
         }
 
         public static double DiceCoefficientUncached(this string input, string comparedTo)
         {
             var ngrams = input.ToBiGrams();
             var compareToNgrams = comparedTo.ToBiGrams();
+          
             return ngrams.DiceCoefficient(compareToNgrams);
+        }
+
+        public static double DiceCoefficientAlternative(this string input, string comparedTo)
+        {
+            var ngrams = input.ToBiGrams();
+            var compareToNgrams = comparedTo.ToUniqueBiGrams();
+
+            return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
+        }
+
+        private static double DiceCoefficientAlternative(this string[] nGrams, HashSet<string> compareToNGrams, int compareToLength)
+        {
+            int matches = 0;
+            int nGramsLength = nGrams.Length;
+            //Use hashset to reduce time complexity to O(1) instead of O(N)
+            for (int i = 0; i < nGramsLength; i++)
+            {
+                if (compareToNGrams.Contains(nGrams[i]))
+                {
+                    ++matches;
+                }               
+            }
+            if (matches == 0)
+            {
+                return 0.0d;
+            }
+            double totalBigrams = nGramsLength + (compareToLength + 1);//total +2 for bigram added chars and -1 for len -1
+            //Console.WriteLine("Alt comparetoLen: " + (compareToLength + 1));
+            return (2 * matches) / totalBigrams;
         }
 
         /// <summary>
@@ -38,27 +79,30 @@ namespace DuoVia.FuzzyStrings
         private static double DiceCoefficient(this string[] nGrams, string[] compareToNGrams)
         {
             int matches = 0;
-            for (int i = 0; i < nGrams.Length; i++)
-            {                                
-                if (compareToNGrams.Contains(nGrams[i]))
+            int nGramsLength = nGrams.Length;
+
+            for (int i = 0; i < nGramsLength; i++)
+            {                               
+                if (Array.IndexOf(compareToNGrams, nGrams[i]) != -1/*compareToNGrams.Contains(nGrams[i])*/)
                 {
-                    matches++;
+                    ++matches;
                 }
             }
             if (matches == 0)
             {
                 return 0.0d;
             }
-            double totalBigrams = nGrams.Length + compareToNGrams.Length;
+            double totalBigrams = nGramsLength + compareToNGrams.Length;
+            //Console.WriteLine("Original comparetoLen: "+ compareToNGrams.Length);
             return (2*matches)/totalBigrams;
         }
 
-        public static string[] ToBiGrams(this string input)
+        private static string[] ToBiGrams(this string input)
         {
             // nLength == 2
             //   from Jackson, return %j ja ac ck ks so on n#
             //   from Main, return #m ma ai in n#
-            input = SinglePercent + input + SinglePound;
+            input = string.Concat(SinglePercent, input, SinglePound);
             return ToNGrams(input, 2);
         }
 
@@ -74,12 +118,23 @@ namespace DuoVia.FuzzyStrings
         private static string[] ToNGrams(string input, int nLength)
         {
             int itemsCount = input.Length - 1;
-            string[] ngrams = new string[input.Length - 1];
+            string[] ngrams = new string[itemsCount];
             for (int i = 0; i < itemsCount; i++)
             {
                 ngrams[i] = input.Substring(i, nLength);
             }
             return ngrams;
         }
+
+
+        private static HashSet<string> ToUniqueBiGrams(this string input)
+        {
+            // nLength == 2
+            //   from Jackson, return %j ja ac ck ks so on n#
+            //   from Main, return #m ma ai in n#
+            input = string.Concat(SinglePercent, input, SinglePound);
+            return new HashSet<string>(ToNGrams(input, 2));
+        }
+      
     }
 }

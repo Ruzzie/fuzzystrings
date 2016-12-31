@@ -1,7 +1,10 @@
-duovia-fuzzystrings
-==========
 
-DuoVia.FuzzyStrings
+
+Ruzzie.FuzzieStrings
+==========
+This is a heavily modified version. I added a fixed size fast in memory cache and optimized the algorithm performance for case insensitive comparisons.
+
+Fork of [Duovia.FuzzieStrings][2]
 ----------
 > 
 > [Get the NuGet Package][1]
@@ -35,4 +38,5 @@ Included Algorithms
 > 
 > The author hopes you will use and help improve this library.
 
-[1]: http://nuget.org/packages/DuoVia.FuzzyStrings/   "Get the NuGet Package"
+[1]: http://nuget.org/packages/Ruzzie.FuzzyStrings/   "Get the NuGet Package"
+[2]: https://github.com/tylerjensen/duovia-fuzzystrings "Duovia.FuzzieStrings"

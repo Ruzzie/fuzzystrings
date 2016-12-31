@@ -6,7 +6,6 @@ namespace fuzzytest
     [TestFixture]
     public class Tests
     {      
-
         [Test]
         [TestCase("test","w",0.078125d)]
         [TestCase("test","W",0.078125d)]
@@ -44,6 +43,7 @@ namespace fuzzytest
         public void DiceCoefficientTests(string input, string compareTo, double expected)
         {
             Assert.That(input.DiceCoefficient(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
+            Assert.That(input.DiceCoefficientAlternative(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
         }
 
         [TestCase("Jensn", "Adams", 4)]
@@ -114,6 +114,7 @@ namespace fuzzytest
         }
 
         [TestCase("Jensn", "Adams", 0.04000d,"s")]
+        [TestCase("Adams", "Jensn", 0.04000d,"s")]
         [TestCase("Jensn", "Benson", 0.33333d, "ensn")]
         [TestCase("Jensn", "Geralds", 0.05714d, "es")]
         [TestCase("Jensn", "Johannson", 0.08889d,"jnsn")]
@@ -124,6 +125,7 @@ namespace fuzzytest
         [TestCase("Jensn", "Stratford", 0.02222d, "s")]
         [TestCase("Jensn", "Wilkins", 0.11429d, "ns")]
         [TestCase("2130 South Fort Union Blvd.", "2689 East Milkin Ave.", 0.0211640211640212, "2 st in v.")]
+        [TestCase("2689 East Milkin Ave.", "2130 South Fort Union Blvd.", 0.0211640211640212, "2 st in v.")]
         [TestCase("2130 South Fort Union Blvd.", "85 Morrison", 0.0202020202020202, " son")]
         [TestCase("2130 South Fort Union Blvd.", "2350 North Main", 0.0444444444444444, "230 oth in")]
         [TestCase("2130 South Fort Union Blvd.", "567 West Center Street", 0.0101010101010101, " st t ")]
@@ -135,9 +137,12 @@ namespace fuzzytest
         [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", 0.0138888888888889, "3 hrvd")]
         public void LongestCommonSubSequenceTests(string input, string compareTo, double expectedDouble, string expectedSequence)
         {
-            Assert.That(input.LongestCommonSubsequence(compareTo).Item2, Is.EqualTo(expectedDouble).Within(0.000009));
-            Assert.That(input.LongestCommonSubsequence(compareTo).Item1, Is.EqualTo(expectedSequence));
+            LongestCommonSubsequenceResult result = input.LongestCommonSubsequence(compareTo);
+            Assert.That(result.Coeffecient, Is.EqualTo(expectedDouble).Within(0.000009));
+            Assert.That(input.LongestCommonSubsequence(compareTo,false,false).Coeffecient, Is.EqualTo(expectedDouble).Within(0.000009));
+            Assert.That(result.LongestSubsequence.ToUpperInvariant(), Is.EqualTo(expectedSequence.ToUpperInvariant()));
         }
+       
 
         [TestCase("Jensn", "Adams", false)]
         [TestCase("Jensn", "Benson", false)]
@@ -161,9 +166,10 @@ namespace fuzzytest
         [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", false)]
         public void FuzzyEqualsTests(string input, string compareTo, bool expected)
         {
-            Assert.That(input.FuzzyEquals(compareTo),Is.EqualTo(expected));
+            Assert.That(input.FuzzyEquals(compareTo, caseSensitive: false), Is.EqualTo(expected));
         }
 
+        [TestCase("Flying (This creature can't be blocked", "Flying (This creature can't be blocked", 0.99999899999999997d)]//equal strings
         [TestCase("Jensn", "Adams", 0.13202380952381d)]
         [TestCase("Jensn", "Benson", 0.499854312354312d)]
         [TestCase("Jensn", "Geralds", 0.0623626373626374)]
@@ -201,7 +207,7 @@ namespace fuzzytest
             0.60841197203094644d)]
         public void FuzzyMatchTests(string input, string compareTo, double expected)
         {
-            Assert.That(input.FuzzyMatch(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
+            Assert.That(input.FuzzyMatch(compareTo, false), Is.EqualTo(expected).Within(0.016));
         }
 
         [Test]
@@ -216,6 +222,6 @@ namespace fuzzytest
         public void CalculateLevenCoefficient(string input, string compareTo, double expected)
         {
             Assert.That(StringExtensions.CalculateLevenCoefficientForCompositeCoefficient(input,compareTo),Is.EqualTo(expected));
-        }     
+        }          
     }
 }

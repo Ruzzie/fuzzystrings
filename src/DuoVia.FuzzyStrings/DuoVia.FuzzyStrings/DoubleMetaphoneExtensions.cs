@@ -28,8 +28,8 @@
 */
 
 using System;
-using System.Collections.Concurrent;
 using System.Text;
+using Ruzzie.Caching;
 
 namespace DuoVia.FuzzyStrings
 {
@@ -43,8 +43,8 @@ namespace DuoVia.FuzzyStrings
     /// </remarks>
     public static class DoubleMetaphoneExtensions
     {
-     
-       static readonly ConcurrentDictionary<string,string> Cache = new ConcurrentDictionary<string, string>(256,18000*4,StringComparer.OrdinalIgnoreCase);
+        private static readonly IFixedSizeCache<string, string> Cache = new FlashCache<string, string>(InternalVariables.DefaultCacheItemSizeInMb,
+            InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes);
 
 
         public static string ToDoubleMetaphone(this string input)
@@ -980,6 +980,7 @@ namespace DuoVia.FuzzyStrings
                 || (self == charO) || (self == charU) || (self == charY);
         }
 
+        // ReSharper disable InconsistentNaming
         private const char charA = 'A';
         private const char charW = 'W';
         private const char charK = 'K';
@@ -1158,7 +1159,7 @@ namespace DuoVia.FuzzyStrings
         private const string strZI = "ZI";
         private const string strZO = "ZO";
         private const string strET = "ET";
-
+        // ReSharper restore InconsistentNaming
 
         static bool StartsWith(this string self, StringComparison comparison, params string[] strings)
         {
@@ -1184,12 +1185,7 @@ namespace DuoVia.FuzzyStrings
                 if( self.Substring(startIndex).ContainsString(strings[i]))
                 {
                     return true;
-                }
-                ;
-                //if (self.IndexOf(strings[i], startIndex, StringComparison.OrdinalIgnoreCase) >= startIndex)
-                //{
-                //    return true;
-                //}
+                }                              
             }
             return false;
         }       

@@ -1,21 +1,12 @@
-﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Derived from http://www.codeguru.com/vb/gen/vb_misc/algorithms/article.php/c13137__1/Fuzzy-Matching-Demo-in-Access.htm
- * and from http://www.berghel.net/publications/asm/asm.php 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 
 namespace DuoVia.FuzzyStrings
 {
     public static class LevenshteinDistanceExtensions
-    {       
-
-        static readonly ConcurrentDictionary<string,int> Cache = new ConcurrentDictionary<string, int>(256,18000*4,StringComparer.OrdinalIgnoreCase);
-
-        public static int LevenshteinDistance(this string input, string comparedTo)
+    {
+        public static int LevenshteinDistance(this string input, string comparedTo, bool caseSensitive = false)
         {
-            return Cache.GetOrAdd(input+comparedTo, key => LevenshteinDistanceUncached(input, comparedTo));
+            return LevenshteinDistanceUncached(input, comparedTo, caseSensitive);
         }
 
         /// <summary>
@@ -24,52 +15,55 @@ namespace DuoVia.FuzzyStrings
         /// </summary>
         /// <param name="input"></param>
         /// <param name="comparedTo"></param>
+        /// <param name="caseSensitive"></param>
         /// <returns></returns>
         /// <remarks>always case insensitive</remarks>
-        public static int LevenshteinDistanceUncached(this string input, string comparedTo)
+        public static int LevenshteinDistanceUncached(this string input, string comparedTo, bool caseSensitive = false)
         {
             if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
             {
                 return -1;
             }
-            
-                input = input.ToLower();
-                comparedTo = comparedTo.ToLower();
-            
+
+            if (!caseSensitive)
+            {
+                input = input.ToUpperInvariant();
+                comparedTo = comparedTo.ToUpperInvariant();
+            }
+
             int inputLen = input.Length;
             int comparedToLen = comparedTo.Length;
 
-            int[][] matrix = new int[inputLen][];
+            int[,] matrix = new int[inputLen, comparedToLen];
 
-            //initialize
-            for (int i = 0; i < inputLen; i++)
+            //initialize           
+            for (var i = 0; i < inputLen; i++)
             {
-                matrix[i] = new int[comparedToLen];
-                matrix[i][0] = i;
+                matrix[i, 0] = i;
             }
-            for (int i = 0; i < comparedToLen; i++)
+            for (var i = 0; i < comparedToLen; i++)
             {
-                matrix[0][i] = i;
+                matrix[0, i] = i;
             }
 
             //analyze
-            for (int i = 1; i < inputLen; i++)
+            for (var i = 1; i < inputLen; i++)
             {
-                var si = input[i - 1];
-                for (int j = 1; j < comparedToLen; j++)
+                ushort si = input[i - 1];
+                for (var j = 1; j < comparedToLen; j++)
                 {
-                    var tj = comparedTo[j - 1];
+                    ushort tj = comparedTo[j - 1];
                     int cost = (si == tj) ? 0 : 1;
 
-                    var above = matrix[i - 1][ j];
-                    var left = matrix[i][j - 1];
-                    var diag = matrix[i - 1][j - 1];
-                    var cell = FindMinimum(above + 1, left + 1, diag + cost);
+                    int above = matrix[i - 1, j];
+                    int left = matrix[i, j - 1];
+                    int diag = matrix[i - 1, j - 1];
+                    int cell = FindMinimumOptimized(above + 1, left + 1, diag + cost);
 
                     //transposition
                     if (i > 1 && j > 1)
                     {
-                        var trans = matrix[i - 2] [j - 2] + 1;
+                        int trans = matrix[i - 2, j - 2] + 1;
                         if (input[i - 2] != comparedTo[j - 1])
                         {
                             trans++;
@@ -83,27 +77,100 @@ namespace DuoVia.FuzzyStrings
                             cell = trans;
                         }
                     }
-                    matrix[i][j] = cell;
+                    matrix[i, j] = cell;
                 }
             }
-            return matrix[inputLen - 1][ comparedToLen - 1];
+            return matrix[inputLen - 1, comparedToLen - 1];
         }
 
-        private static int FindMinimum(params int[] p)
+        public static int FindMinimum(params int[] p)
         {
-            if (null == p)
+            if (ReferenceEquals(null,p))
             {
                 return int.MinValue;
             }
             int min = int.MaxValue;
-            for (int i = 0; i < p.Length; i++)
+            int length = p.Length;
+            for (var i = 0; i < length; ++i)
             {
+                //min = Math.Min(min, p[i]);
                 if (min > p[i])
                 {
                     min = p[i];
                 }
             }
             return min;
+        }
+
+        public static int FindMinimumOptimized(int a, int b, int c)
+        {
+            return Math.Min(a, Math.Min(b, c));
+        }
+
+        public static int LevenshteinDistanceUncachedAlternative(this string input, string comparedTo, bool caseSensitive = false)
+        {
+            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
+            {
+                return -1;
+            }
+
+            if (!caseSensitive)
+            {
+                input = input.ToUpperInvariant();
+                comparedTo = comparedTo.ToUpperInvariant();
+            }
+
+            int inputLen = input.Length;
+            int comparedToLen = comparedTo.Length;
+
+            int[,] matrix = new int[inputLen, comparedToLen];
+
+
+            for (var i = 0; i < inputLen; i++)
+            {
+                matrix[i, 0] = i;
+            }
+            for (var i = 0; i < comparedToLen; i++)
+            {
+                matrix[0, i] = i;
+            }
+
+            //analyze
+            for (var i = 1; i < inputLen; i++)
+            {
+                char si = input[i - 1];
+                for (var j = 1; j < comparedToLen; j++)
+                {
+                    char tj = comparedTo[j - 1];
+                    int cost = (si == tj) ? 0 : 1;
+
+                    int above = matrix[i - 1, j];
+                    int left = matrix[i, j - 1];
+                    int diag = matrix[i - 1, j - 1];
+                    int cell = FindMinimumOptimized(above + 1, left + 1, diag + cost);
+
+                    //transposition
+                    if (i > 1 && j > 1)
+                    {
+                        int trans = matrix[i - 2, j - 2] + 1;
+                        if (input[i - 2] != comparedTo[j - 1])
+                        {
+                            trans++;
+                        }
+                        if (input[i - 1] != comparedTo[j - 2])
+                        {
+                            trans++;
+                        }
+                        if (cell > trans)
+                        {
+                            cell = trans;
+                        }
+                    }
+                    matrix[i, j] = cell;
+                }
+
+            }
+            return matrix[inputLen - 1, comparedToLen - 1];
         }
     }
 }
