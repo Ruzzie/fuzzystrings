@@ -87,7 +87,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DuoVia.FuzzyStrings\Ruzzie.FuzzyStrings.csproj">
+    <ProjectReference Include="..\Ruzzie.FuzzyStrings\Ruzzie.FuzzyStrings.csproj">
       <Project>{29385a2d-eac1-4777-bc01-c060c2002307}</Project>
       <Name>Ruzzie.FuzzyStrings</Name>
     </ProjectReference>
