@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Ruzzie.Caching;
 
-namespace DuoVia.FuzzyStrings
+namespace Ruzzie.FuzzyStrings
 {
     public static class StringExtensions
     {

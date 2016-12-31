@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.VisualBasic.Devices;
 using Ruzzie.Caching;
 
-namespace DuoVia.FuzzyStrings
+namespace Ruzzie.FuzzyStrings
 {
     public static class InternalVariables
     {

@@ -6,10 +6,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DuoVia.FuzzyStrings;
 using NUnit.Framework;
 
-namespace fuzzytest
+namespace Ruzzie.FuzzyStrings.UnitTests
 {
     [TestFixture]
     public class CachedMethodPerformanceTests

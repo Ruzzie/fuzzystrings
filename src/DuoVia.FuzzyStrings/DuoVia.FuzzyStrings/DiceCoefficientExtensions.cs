@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using Ruzzie.Caching;
 
-namespace DuoVia.FuzzyStrings
+namespace Ruzzie.FuzzyStrings
 {
     public static class DiceCoefficientExtensions
     {

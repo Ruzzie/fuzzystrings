@@ -1,7 +1,6 @@
-﻿using DuoVia.FuzzyStrings;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
-namespace fuzzytest
+namespace Ruzzie.FuzzyStrings.UnitTests
 {
     [TestFixture]
     public class Tests

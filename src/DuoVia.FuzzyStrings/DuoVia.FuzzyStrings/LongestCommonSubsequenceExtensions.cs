@@ -4,7 +4,7 @@
 
 using System;
 
-namespace DuoVia.FuzzyStrings
+namespace Ruzzie.FuzzyStrings
 {
     public static class LongestCommonSubsequenceExtensions
     {      

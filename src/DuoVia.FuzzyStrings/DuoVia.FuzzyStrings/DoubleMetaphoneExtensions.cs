@@ -31,7 +31,7 @@ using System;
 using System.Text;
 using Ruzzie.Caching;
 
-namespace DuoVia.FuzzyStrings
+namespace Ruzzie.FuzzyStrings
 {
     /// <summary>
     /// DoubleMetaphone string extension
