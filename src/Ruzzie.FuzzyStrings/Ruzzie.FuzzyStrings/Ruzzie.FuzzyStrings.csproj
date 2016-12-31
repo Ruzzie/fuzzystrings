@@ -73,12 +73,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Ruzzie.Caching, Version=0.12.92.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\deckcardbuilder\source\MtgDeckCardGenerator\packages\Ruzzie.Cache.FlashCache.0.12.92\lib\net461\Ruzzie.Caching.dll</HintPath>
+    <Reference Include="Ruzzie.Caching, Version=0.12.94.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ruzzie.Cache.FlashCache.0.12.94\lib\net461\Ruzzie.Caching.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ruzzie.Common, Version=0.7.28.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\deckcardbuilder\source\MtgDeckCardGenerator\packages\Ruzzie.Common.0.7.28\lib\net461\Ruzzie.Common.dll</HintPath>
+    <Reference Include="Ruzzie.Common, Version=0.8.32.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ruzzie.Common.0.8.32\lib\net461\Ruzzie.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
