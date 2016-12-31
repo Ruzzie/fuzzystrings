@@ -1,10 +1,10 @@
 
 
-Ruzzie.FuzzieStrings
+Ruzzie.FuzzyStrings
 ==========
 This is a heavily modified version. I added a fixed size fast in memory cache and optimized the algorithm performance for case insensitive comparisons.
 
-Fork of [Duovia.FuzzieStrings][2]
+Fork of [Duovia.FuzzyStrings][2]
 ----------
 > 
 > [Get the NuGet Package][1]
