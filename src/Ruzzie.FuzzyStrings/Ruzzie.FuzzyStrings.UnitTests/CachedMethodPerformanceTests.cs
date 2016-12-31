@@ -16,7 +16,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [Test]
         public void CachedFuzzyMatchFasterThanUncached()
         {
-            int numberOfIterationsToPerform = 1000;
+            int numberOfIterationsToPerform = 500;
 
             AssertCachedMethodIsFasterThanUncachedMethod(
                 s => s.FuzzyMatchUncached("Compare to string FuzzyMatchUn").ToString(CultureInfo.InvariantCulture),
@@ -131,9 +131,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             Func<bool> alternativereplace = () => sourceString.ContainsString(stringToFind + random.Next());
 
-
-            TimeSpan classicTimings = ExecuteMethodAndReturnTimings(1000000, classicContains);
-            TimeSpan alternativereplaceTimings = ExecuteMethodAndReturnTimings(1000000, alternativereplace);
+            TimeSpan classicTimings = ExecuteMethodAndReturnTimings(100000, classicContains);
+            TimeSpan alternativereplaceTimings = ExecuteMethodAndReturnTimings(100000, alternativereplace);
 
             Console.WriteLine("Classic timing: " + classicTimings.TotalMilliseconds);
             Console.WriteLine("Alternative timing: " + alternativereplaceTimings.TotalMilliseconds);
@@ -151,8 +150,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             Func<string> customStrip = () => StringExtensions.StripAlternative(sourceString + random.Next());
 
-
-            var numberOfTimesToExecute = 100000;
+            var numberOfTimesToExecute = 10000;
             TimeSpan regexStripTiming = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, regexStrip);
             TimeSpan alternativeStripTiming = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, customStrip);
 
@@ -206,8 +204,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Func<bool> alternativeContains = () => sourceString.AnyString(stringToFind);
 
 
-            TimeSpan classicTimings = ExecuteMethodAndReturnTimings(1000000, classicContains);
-            TimeSpan alternativereplaceTimings = ExecuteMethodAndReturnTimings(1000000, alternativeContains);
+            TimeSpan classicTimings = ExecuteMethodAndReturnTimings(100000, classicContains);
+            TimeSpan alternativereplaceTimings = ExecuteMethodAndReturnTimings(100000, alternativeContains);
 
             Console.WriteLine("Classic timing: " + classicTimings.TotalMilliseconds);
             Console.WriteLine("Alternative timing: " + alternativereplaceTimings.TotalMilliseconds);
@@ -227,12 +225,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             Func<int> alternative = () => (sourceString + next).LevenshteinDistanceUncachedAlternative(stringToFind + next);
 
-
-            var numberOfTimesToExecute = 5000;
+            var numberOfTimesToExecute = 1000;
 
             //warmup
-            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(1000, alternative);
-            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(1000, original);
+            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(500, alternative);
+            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(500, original);
 
             //execute
             alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
@@ -257,7 +254,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             Func<double> alternative = () => (sourceString + random.Next()).DiceCoefficientAlternative(stringToFind + random.Next());
 
-            var numberOfTimesToExecute = 10000;
+            var numberOfTimesToExecute = 1000;
 
             //warmup
             TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
@@ -282,9 +279,9 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Func<string> toUpperInvariant = () =>  (one + random.Next()).ToUpperInvariant();
             // ReSharper restore AccessToModifiedClosure
 
-            var toLowerTiming = ExecuteMethodAndReturnTimings(1000000, toLower);
+            var toLowerTiming = ExecuteMethodAndReturnTimings(100000, toLower);
             random = new Random(13);
-            var toUpperInvariantTiming = ExecuteMethodAndReturnTimings(1000000, toUpperInvariant);
+            var toUpperInvariantTiming = ExecuteMethodAndReturnTimings(100000, toUpperInvariant);
 
             Console.WriteLine("toLowerTiming timing: " + toLowerTiming.TotalMilliseconds);
             Console.WriteLine("toUpperInvariantTiming timing: " + toUpperInvariantTiming.TotalMilliseconds);
