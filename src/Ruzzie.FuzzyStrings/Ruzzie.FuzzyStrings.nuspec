@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Ruzzie.FuzzyStrings</id>
+    <version>$version$</version>
+    <title>Ruzzie.FuzzyStrings</title>
+    <authors>Dorus Verhoeckx</authors>
+    <owners>Dorus Verhoeckx</owners>
+    <licenseUrl>https://github.com/Ruzzie/flashcache/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/Ruzzie/fuzzystrings</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A collection of fuzzy string algorithms for .net</description>
+    <copyright>Copyright 2016</copyright>
+    <tags>Fuzzy String Cached</tags>
+	  <dependencies>
+      <dependency id="Ruzzie.Cache.FlashCache" version="(0.12.94,)" />
+    </dependencies>
+  </metadata>
+  
+   <files>
+		<file src="Ruzzie.FuzzyStrings\_license.txt" />
+		<file src="Ruzzie.FuzzyStrings\bin\Release\*Ruzzie.FuzzyStrings*.*" target="lib\net461\"/>  
+    </files>
+</package>

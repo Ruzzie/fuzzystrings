@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DuoVia.FuzzyStrings")]
+[assembly: AssemblyTitle("Ruzzie.FuzzyStrings")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("DuoVia Inc.")]
-[assembly: AssemblyProduct("DuoVia.FuzzyStrings")]
-[assembly: AssemblyCopyright("Copyright © DuoVia Inc. 2013-2014")]
+[assembly: AssemblyCompany("D Crafting")]
+[assembly: AssemblyProduct("Ruzzie.FuzzyStrings")]
+[assembly: AssemblyCopyright("Copyright © Dorus Verhoeckx 2015-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
