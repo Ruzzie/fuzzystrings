@@ -8,7 +8,7 @@ namespace Ruzzie.FuzzyStrings
     public static class StringExtensions
     {
         private static readonly IFixedSizeCache<string, double> Cache =
-            new FlashCache<string, double>(1024, InternalVariables.StringComparerForCacheKey,
+            new FlashCache<string, double>(InternalVariables.MaxCacheSizeInMb, InternalVariables.StringComparerForCacheKey,
                 InternalVariables.AverageStringSizeInBytes);
 
         private const string Space = " ";

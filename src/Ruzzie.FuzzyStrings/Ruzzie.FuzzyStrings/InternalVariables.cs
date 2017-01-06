@@ -24,7 +24,7 @@ namespace Ruzzie.FuzzyStrings
             finally
             {
                 DefaultCacheItemSizeInMb = Math.Max(1, mbOfMemoryAvailable / 400);
-                MaxCacheSizeInMb = Math.Max(DefaultCacheItemSizeInMb * 2, mbOfMemoryAvailable / 4);
+                MaxCacheSizeInMb = Math.Max(DefaultCacheItemSizeInMb * 2, mbOfMemoryAvailable / 8);
             }
         }
     }
