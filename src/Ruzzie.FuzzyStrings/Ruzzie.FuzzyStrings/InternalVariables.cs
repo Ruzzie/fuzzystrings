@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+
+#if HAVE_VISUALBASIC_DEVICES
 using Microsoft.VisualBasic.Devices;
+#elif !PORTABLE
+using System.Diagnostics;
+#endif
 using Ruzzie.Caching;
 
 namespace Ruzzie.FuzzyStrings
@@ -17,8 +22,18 @@ namespace Ruzzie.FuzzyStrings
             int mbOfMemoryAvailable = 0;
             try
             {
+                long bytesOfMemoryAvailable;                
+#if HAVE_VISUALBASIC_DEVICES
                 ComputerInfo info = new ComputerInfo();
-                ulong bytesOfMemoryAvailable = info.AvailablePhysicalMemory;
+                bytesOfMemoryAvailable = (long) info.AvailablePhysicalMemory;
+#elif !PORTABLE
+                using(Process currentProcess = Process.GetCurrentProcess())
+                {
+                    bytesOfMemoryAvailable = currentProcess.MaxWorkingSet.ToInt64() * 16;
+                }
+#else
+                bytesOfMemoryAvailable = GC.GetTotalMemory(false) * 16;                                    
+#endif
                 mbOfMemoryAvailable = (int) ((bytesOfMemoryAvailable / 1024) / 1024);
             }
             finally

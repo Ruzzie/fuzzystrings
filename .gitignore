@@ -163,3 +163,5 @@ pip-log.txt
 .DS_Store
 src/DuoVia.FuzzyStrings/packages/
 src/Ruzzie.FuzzyStrings/packages/
+src/Ruzzie.FuzzyStrings/.vs/
+project.lock.json

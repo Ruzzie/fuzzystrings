@@ -12,7 +12,12 @@ namespace Ruzzie.FuzzyStrings
                 InternalVariables.AverageStringSizeInBytes);
 
         private const string Space = " ";
-        private static readonly Regex StripRegex = new Regex(@"[^a-zA-Z0-9 -]*",RegexOptions.Compiled);
+#if !PORTABLE
+        private static readonly Regex StripRegex = new Regex(@"[^a-zA-Z0-9 -]*", RegexOptions.Compiled);
+#else
+         private static readonly Regex StripRegex = new Regex(@"[^a-zA-Z0-9 -]*");
+#endif
+
 
         public static bool FuzzyEquals(this string strA, string strB, double requiredProbabilityScore = 0.75, bool caseSensitive = true)
         {
