@@ -34,7 +34,7 @@
     },
     "net461": {
       "buildOptions": {
-        "define": [ "HAVE_SERIALIZABLE", "HAVE_VISUALBASIC_DEVICES" ]
+        "define": [ "HAVE_SERIALIZABLE", "HAVE_VISUALBASIC_DEVICES", "HAVE_PARALLELPERFORMANCE" ]
       },
       "frameworkAssemblies": {
         "Microsoft.VisualBasic": ""
