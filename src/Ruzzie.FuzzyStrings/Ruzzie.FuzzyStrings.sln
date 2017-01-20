@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Ruzzie.FuzzyStrings", "Ruzzie.FuzzyStrings\Ruzzie.FuzzyStrings.xproj", "{DCB8BDEA-76EA-4DF9-8A27-83BFA3660E53}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Ruzzy.FuzzyStrings.UnitTests", "Ruzzy.FuzzyStrings.UnitTests\Ruzzy.FuzzyStrings.UnitTests.xproj", "{09E35D60-6A44-4C0A-B459-80954FF978C1}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Ruzzie.FuzzyStrings.UnitTests", "Ruzzie.FuzzyStrings.UnitTests\Ruzzie.FuzzyStrings.UnitTests.xproj", "{09E35D60-6A44-4C0A-B459-80954FF978C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
