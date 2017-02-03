@@ -3,6 +3,22 @@
 namespace Ruzzie.FuzzyStrings.UnitTests
 {
     [TestFixture]
+    public class WhitespaceTokenizerTests
+    {
+        [TestCase("a\nb\tc d",4)]
+        [TestCase("a\nb\tc",3)]
+        [TestCase("a c",2)]
+        [TestCase("ac",1)]
+        [TestCase("",0)]
+        public void TokenizeTest(string input, int expectedTokenCount)
+        {
+            IStringTokenizer stringTokenizer = new WhitespaceTokenizer();
+
+            Assert.That(stringTokenizer.Tokenize(input).Length, Is.EqualTo(expectedTokenCount));
+        }
+    }
+
+    [TestFixture]
     public class Tests
     {      
         [Test]
@@ -13,10 +29,25 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("test"," w",0.078125d)]
         [TestCase("test"," W",0.078125d)]
         [TestCase("test"," w ",0.078125d)]
-        [TestCase("test"," W ",0.078125d)]
+        [TestCase("test"," W ",0.078125d)]     
+        [TestCase("Kjeldoran Elite Guard", "Kjeldoran Elite Guard", StringExtensions.ExactMatchProbability)]
         public void IssueTest(string input, string compareTo, double expected)
         {
             Assert.That(input.FuzzyMatch(compareTo),Is.EqualTo(expected));          
+        }
+
+        [TestCase("Kjeldoran elite", "Kjeldoran Gargoyle", 0.56876095071684585d)]
+        [TestCase("Kjeldoran Gargoyle", "Kjeldoran elite", 0.56876095071684585d)]
+        [TestCase("Kjeldoran elite", "Kjeldoran Elite Guard", 0.71456486550605902d)]
+        [TestCase("kjeldoran elite guard", "kjeldoran elite guard", StringExtensions.ExactMatchProbability)]
+        [TestCase("guard elite kjeldoran", "kjeldoran elite guard", 0.7096877533708823d)]
+        [TestCase("guard kjeldoran elite", "kjeldoran elite guard", 0.7096877533708823d)]
+        [TestCase("kjeldoran elite guard master", "kjeldoran elite guard", 0.56233325962812675d)]
+        [TestCase("", "",StringExtensions.ExactMatchProbability)]
+        [TestCase("\t\n", "   ", StringExtensions.ExactMatchProbability)]        
+        public void TokenizeFuzzyMatch(string input, string compareTo, double expected)
+        {
+            Assert.That(input.FuzzyMatchTokens(compareTo, false), Is.EqualTo(expected));
         }
 
         [TestCase("Jensn","Adams", 0d )]

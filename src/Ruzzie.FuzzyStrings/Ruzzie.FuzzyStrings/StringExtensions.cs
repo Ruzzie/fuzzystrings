@@ -12,6 +12,8 @@ namespace Ruzzie.FuzzyStrings
                 InternalVariables.AverageStringSizeInBytes);
 
         private const string Space = " ";
+        public const double ExactMatchProbability = 0.99999899999999997d;
+        public const double FuzzyMatchMaxProbability = 0.99998899999999997d;
 #if !PORTABLE
         private static readonly Regex StripRegex = new Regex(@"[^a-zA-Z0-9 -]*", RegexOptions.Compiled);
 #else
@@ -22,6 +24,73 @@ namespace Ruzzie.FuzzyStrings
         public static bool FuzzyEquals(this string strA, string strB, double requiredProbabilityScore = 0.75, bool caseSensitive = true)
         {
             return strA.FuzzyMatch(strB, caseSensitive) > requiredProbabilityScore;
+        }
+
+        /// <summary>
+        /// Tokenize the strings and returns an average probability by matching the tokens divided by the number of comparisons.
+        /// Contrary to FuzzyMatch, which also matches 'words' this method does not take distance and order into account.
+        /// </summary>
+        public static double FuzzyMatchTokens(this string strA, string strB, bool caseSensitive = true)
+        {
+            return FuzzyMatchTokens(strA, strB, DefaultWhitespaceTokenizer, caseSensitive);
+        }
+
+        public static IStringTokenizer DefaultWhitespaceTokenizer = new WhitespaceTokenizer();
+
+        /// <summary>
+        /// Tokenize the strings and returns an average probability by matching the tokens divided by the number of comparisons.
+        /// Contrary to FuzzyMatch, which also matches 'words' this method does not take distance and order into account.
+        /// </summary>
+        public static double FuzzyMatchTokens(this string strA, string strB, IStringTokenizer tokenizer, bool caseSensitive = true)
+        {
+            if (tokenizer == null)
+            {
+                throw new ArgumentNullException(nameof(tokenizer));
+            }
+            var strATokens = tokenizer.Tokenize(strA.Trim());
+            var strBTokens = tokenizer.Tokenize(strB.Trim());
+            if (strATokens.Length == 0)
+            {
+                if (strBTokens.Length == 0)
+                {
+                    return ExactMatchProbability;
+                }
+            }
+            var comparisonCount = 0;
+            var numberOfExactMatches = 0;
+            var numberOfExactPositionMatches = 0;
+            var totalScore = 0d;
+            var strATokensLength = strATokens.Length;
+            var strBTokensLength = strBTokens.Length;
+
+            for (int i = 0; i < strATokensLength; i++)
+            {
+                for (int j = 0; j < strBTokensLength; j++)
+                {
+                    var score = FuzzyMatch(strATokens[i], strBTokens[j], caseSensitive);
+                    if (Math.Abs(score - ExactMatchProbability) < 0.000000000000000001)
+                    {
+                        //exact match
+                        numberOfExactMatches++;
+                        if (i == j)
+                        {
+                            numberOfExactPositionMatches++;
+                        }
+                    }
+                    totalScore += score;
+                    comparisonCount++;
+                }
+            }
+
+            var maxTokenCount = Math.Max(strATokensLength, strBTokensLength);
+            if (maxTokenCount == numberOfExactPositionMatches)
+            {
+                return ExactMatchProbability;
+            }
+
+            var exactMatchScore = (double) numberOfExactMatches / comparisonCount;
+
+            return Math.Min((totalScore / comparisonCount) + exactMatchScore, FuzzyMatchMaxProbability);
         }
 
         public static double FuzzyMatch(this string strA, string strB, bool caseSensitive = true)
@@ -37,7 +106,7 @@ namespace Ruzzie.FuzzyStrings
             {                
                 if (string.Equals(localA, localB, StringComparison.OrdinalIgnoreCase))
                 {
-                    return 0.99999899999999997d;
+                    return ExactMatchProbability;
                 }
 
                 localA = localA.ToUpperInvariant();
@@ -47,7 +116,7 @@ namespace Ruzzie.FuzzyStrings
             {              
                 if (string.Equals(localA, localB, StringComparison.Ordinal))
                 {
-                    return 0.99999899999999997d;
+                    return ExactMatchProbability;
                 }
             }
 
@@ -56,13 +125,15 @@ namespace Ruzzie.FuzzyStrings
                 var partsA = localA.Split(' ');
                 var partsB = localB.Split(' ');
                 int partsAlength = partsA.Length;
+                int partsBLength = partsB.Length;
                 double weightedHighCoefficientsSum = 0;
 
                 for (int i = 0; i < partsAlength; i++)
                 {
                     double high = 0.0;
                     int indexDistance = 0;
-                    for (int x = 0; x < partsB.Length; x++)
+                   
+                    for (int x = 0; x < partsBLength; x++)
                     {
                         var coef = CompositeCoefficient(partsA[i], partsB[x]);
                         if (coef > high)
@@ -75,10 +146,10 @@ namespace Ruzzie.FuzzyStrings
                     weightedHighCoefficientsSum += high*distanceWeight;
                 }
                 double avgWeightedHighCoefficient = weightedHighCoefficientsSum / partsAlength;
-                return avgWeightedHighCoefficient < 0.999999 ? avgWeightedHighCoefficient : 0.999999; //fudge factor
+                return avgWeightedHighCoefficient < 0.999999 ? avgWeightedHighCoefficient : FuzzyMatchMaxProbability; //fudge factor
             }
             var singleComposite = CompositeCoefficient(localA, localB);
-            return singleComposite < 0.999999 ? singleComposite : 0.999999; //fudge factor
+            return singleComposite < 0.999999 ? singleComposite : FuzzyMatchMaxProbability; //fudge factor
         }
 
         public static string Strip(string str)
@@ -123,14 +194,11 @@ namespace Ruzzie.FuzzyStrings
         public static bool ContainsString(this string input, string stringToFind)
         {
             return input.Contains(stringToFind);
-           // return input.IndexOf(stringToFind, comparison) != -1; //input.Contains(stringToFind);
-           // return ((input.Length - input.ReplaceString(stringToFind, String.Empty).Length)/stringToFind.Length > 0);
         }
 
         public static bool AnyString(this string input, string stringToFind, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
-             return input.IndexOf(stringToFind,0, comparison) != -1; //input.Contains(stringToFind);
-            // return ((input.Length - input.ReplaceString(stringToFind, String.Empty).Length)/stringToFind.Length > 0);
+             return input.IndexOf(stringToFind,0, comparison) != -1;
         }
 
         private static double CompositeCoefficient(string strA, string strB, bool caseSensitive = true)
@@ -164,6 +232,5 @@ namespace Ruzzie.FuzzyStrings
             double levenCoefficient = 1.0 / (1.0 * (leven + 0.2));
             return levenCoefficient;
         }
-       
     }
 }
