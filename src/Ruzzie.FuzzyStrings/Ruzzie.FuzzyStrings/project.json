@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "title": "Ruzzie.FuzzyStrings",
   "description": "A collection of fuzzy string algorithms for .net",
@@ -14,7 +14,7 @@
     }
   },
   "dependencies": {
-    "Ruzzie.Cache.FlashCache": "2.0.100"
+    "Ruzzie.Cache.FlashCache": "2.0.102"
   },
   "frameworks": {
     "netstandard1.6": {
