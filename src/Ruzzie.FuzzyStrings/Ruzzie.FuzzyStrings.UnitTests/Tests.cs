@@ -30,7 +30,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("test"," W",0.078125d)]
         [TestCase("test"," w ",0.078125d)]
         [TestCase("test"," W ",0.078125d)]     
-        [TestCase("Kjeldoran Elite Guard", "Kjeldoran Elite Guard", StringExtensions.ExactMatchProbability)]
+        [TestCase("Kjeldoran Elite Guard", "Kjeldoran Elite Guard", StringExtensions.ExactMatchProbability)]        
         public void IssueTest(string input, string compareTo, double expected)
         {
             Assert.That(input.FuzzyMatch(compareTo),Is.EqualTo(expected));          
@@ -43,6 +43,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("guard elite kjeldoran", "kjeldoran elite guard", 0.7096877533708823d)]
         [TestCase("guard kjeldoran elite", "kjeldoran elite guard", 0.7096877533708823d)]
         [TestCase("kjeldoran elite guard master", "kjeldoran elite guard", 0.56233325962812675d)]
+        [TestCase("Grizzled Angler", "Tangle Angler", 0.65827161366500886d)]
         [TestCase("", "",StringExtensions.ExactMatchProbability)]
         [TestCase("\t\n", "   ", StringExtensions.ExactMatchProbability)]        
         public void TokenizeFuzzyMatch(string input, string compareTo, double expected)

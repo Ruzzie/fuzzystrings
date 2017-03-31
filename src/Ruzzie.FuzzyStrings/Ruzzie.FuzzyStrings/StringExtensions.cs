@@ -109,8 +109,8 @@ namespace Ruzzie.FuzzyStrings
                     return ExactMatchProbability;
                 }
 
-                localA = localA.ToUpperInvariant();
-                localB = localB.ToUpperInvariant();
+                localA = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(localA);
+                localB = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(localB);
             }
             else
             {              

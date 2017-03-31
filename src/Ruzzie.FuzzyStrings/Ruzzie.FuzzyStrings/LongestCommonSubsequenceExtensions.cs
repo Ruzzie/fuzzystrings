@@ -17,8 +17,8 @@ namespace Ruzzie.FuzzyStrings
         {
             if (!caseSensitive)
             {
-                input = input.ToUpperInvariant();
-                comparedTo = comparedTo.ToUpperInvariant();
+                input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
+                comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);
             }
 
             int inputLen = input.Length;
@@ -134,8 +134,8 @@ namespace Ruzzie.FuzzyStrings
 
             if (!caseSensitive)
             {
-                input = input.ToUpperInvariant();
-                comparedTo = comparedTo.ToUpperInvariant();
+                input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
+                comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);
             }
 
             int inputLen = input.Length;

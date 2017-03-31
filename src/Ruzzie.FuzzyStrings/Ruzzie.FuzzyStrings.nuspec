@@ -17,24 +17,30 @@
       <group targetFramework=".NETCoreApp1.0">
         <dependency id="Microsoft.NETCore.App" version="[1.0.1, )" />
         <dependency id="System.Diagnostics.Process" version="[4.1.0, )" />
-        <dependency id="Ruzzie.Cache.FlashCache" version="[2.0.102, )" />
+        <dependency id="Ruzzie.Cache.FlashCache" version="[2.1.103, )" />
+		<dependency id="Ruzzie.Common" version="[1.1.53, )" />
       </group>
       <group targetFramework=".NETFramework4.5">
-        <dependency id="Ruzzie.Cache.FlashCache" version="[2.0.102, )" />
+        <dependency id="Ruzzie.Cache.FlashCache" version="[2.1.103, )" />
+		<dependency id="Ruzzie.Common" version="[1.1.53, )" />
       </group>
       <group targetFramework=".NETFramework4.6">
-        <dependency id="Ruzzie.Cache.FlashCache" version="[2.0.102, )" />
+        <dependency id="Ruzzie.Cache.FlashCache" version="[2.1.103, )" />
+		<dependency id="Ruzzie.Common" version="[1.1.53, )" />
       </group>
       <group targetFramework=".NETFramework4.6.1">
-        <dependency id="Ruzzie.Cache.FlashCache" version="[2.0.102, )" />
+        <dependency id="Ruzzie.Cache.FlashCache" version="[2.1.103, )" />
+		<dependency id="Ruzzie.Common" version="[1.1.53, )" />
       </group>
       <group targetFramework=".NETPortable4.0-Profile344">
-        <dependency id="Ruzzie.Cache.FlashCache" version="[2.0.102, )" />
+        <dependency id="Ruzzie.Cache.FlashCache" version="[2.1.103, )" />
+		<dependency id="Ruzzie.Common" version="[1.1.53, )" />
       </group>
       <group targetFramework=".NETStandard1.6">
         <dependency id="NETStandard.Library" version="[1.6.1, )" />
         <dependency id="System.Diagnostics.Process" version="[4.1.0, )" />
-        <dependency id="Ruzzie.Cache.FlashCache" version="[2.0.102, )" />
+        <dependency id="Ruzzie.Cache.FlashCache" version="[2.1.103, )" />
+		<dependency id="Ruzzie.Common" version="[1.1.53, )" />
       </group>
     </dependencies>
     <frameworkAssemblies>

@@ -62,7 +62,7 @@ namespace Ruzzie.FuzzyStrings
                 return input;
             }
 
-            string workingString = input.ToUpperInvariant() + "     ";
+            string workingString = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input) + "     ";
 
             bool isSlavoGermanic = (input.IndexOf(charW) > -1)
                 || (input.IndexOf(charK) > -1)
