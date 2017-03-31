@@ -3,6 +3,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Ruzzie.FuzzyStrings
 {
@@ -43,7 +44,7 @@ namespace Ruzzie.FuzzyStrings
             {
                 for (int j = 1; j <= comparedToLen; ++j)
                 {
-                    if (input[i - 1].Equals(comparedTo[j - 1]))
+                    if (input[i - 1] == (comparedTo[j - 1]))
                     {
                         int k = w[i - 1, j - 1];
                         lcs[i, j] = lcs[i - 1, j - 1] + SquareOfValuePlusOneMinusSquareOfValue(k);
@@ -77,6 +78,9 @@ namespace Ruzzie.FuzzyStrings
             return CalculateLongestCommonSubSequence(input, inputLen, comparedToLen, tracks, coef);
         }
 
+#if !PORTABLE
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static int SquareOfValuePlusOneMinusSquareOfValue(int k)
         {
             /*Square(k + 1) - Square(k) // this can be written as 2k +1 */
@@ -111,6 +115,7 @@ namespace Ruzzie.FuzzyStrings
             return new LongestCommonSubsequenceResult(subseq, coef);
         }
 
+        static readonly LongestCommonSubsequenceResult EmptyResult = default(LongestCommonSubsequenceResult);
         /// <summary>
         ///     Longest Common Subsequence. A good value is greater than 0.33.
         /// </summary>
@@ -124,7 +129,7 @@ namespace Ruzzie.FuzzyStrings
         {
             if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
             {
-                return new LongestCommonSubsequenceResult();
+                return EmptyResult;
             }
 
             if (includeLongestSubsequenceInResult)
@@ -150,7 +155,7 @@ namespace Ruzzie.FuzzyStrings
                 {
                     int currentLcs;
                     int currentK;
-                    if (input[i - 1].Equals(comparedTo[j - 1]))
+                    if (input[i - 1] == (comparedTo[j - 1]))
                     {
                         int k = w[i - 1, j - 1];
                         currentLcs = lcs[i - 1, j - 1] + SquareOfValuePlusOneMinusSquareOfValue(k);
@@ -179,9 +184,7 @@ namespace Ruzzie.FuzzyStrings
             double coef = p / (inputLen * comparedToLen);
 
             return new LongestCommonSubsequenceResult(coef);
-
-        }
-      
+        }      
     }
 
     internal enum LcsDirection
