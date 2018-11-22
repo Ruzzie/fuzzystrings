@@ -12,8 +12,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase(" Æther Vial-", " ther Vial-")]
         public void SmokeTest(string input, string expected)
         {
-            Assert.That(StringExtensions.Strip(input), Is.EqualTo(expected));
-            Assert.That(StringExtensions.StripAlternative(input), Is.EqualTo(StringExtensions.Strip(input)));
+            Assert.That(StringExtensions.StripWithRegex(input), Is.EqualTo(expected));
+            Assert.That(StringExtensions.StripAlternative(input), Is.EqualTo(StringExtensions.StripWithRegex(input)));
         }
 
         [Test]

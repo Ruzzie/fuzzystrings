@@ -20,7 +20,7 @@ namespace Ruzzie.FuzzyStrings
         private const string SinglePercent = "%";
         private const string SinglePound = "#";
         private const string DoublePercent = "&&";
-        private const string DoublePount = "##";
+        private const string DoublePound = "##";
 
         public static double DiceCoefficient(this string input, string comparedTo)
         {
@@ -111,7 +111,7 @@ namespace Ruzzie.FuzzyStrings
             // nLength == 3
             //   from Jackson, return %%j %ja jac ack cks kso son on# n##
             //   from Main, return ##m #ma mai ain in# n##
-            input = DoublePercent + input + DoublePount;
+            input = DoublePercent + input + DoublePound;
             return ToNGrams(input, 3);
         }
 

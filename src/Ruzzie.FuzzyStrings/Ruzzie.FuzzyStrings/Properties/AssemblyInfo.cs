@@ -5,11 +5,11 @@ using System.Runtime.CompilerServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Ruzzie.FuzzyStrings")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A collection of fuzzy string algorithms for .net")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("D Crafting")]
 [assembly: AssemblyProduct("Ruzzie.FuzzyStrings")]
-[assembly: AssemblyCopyright("Copyright © Dorus Verhoeckx 2015-2017")]
+[assembly: AssemblyCopyright("Copyright © Dorus Verhoeckx 2015-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

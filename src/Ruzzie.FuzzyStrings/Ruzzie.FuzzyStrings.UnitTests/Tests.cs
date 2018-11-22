@@ -252,7 +252,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
              0.83333333333333337)]
         public void CalculateLevenCoefficient(string input, string compareTo, double expected)
         {
-            Assert.That(StringExtensions.CalculateLevenCoefficientForCompositeCoefficient(input,compareTo),Is.EqualTo(expected));
+            Assert.That(StringExtensions.CalculateLevenshteinDistanceCoefficientForCompositeCoefficient(input,compareTo),Is.EqualTo(expected));
         }          
     }
 }

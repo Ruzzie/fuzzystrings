@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #if HAVE_VISUALBASIC_DEVICES
 using Microsoft.VisualBasic.Devices;
-#elif !PORTABLE
+#elif !PORTABLE && HAVE_PROCESS
 using System.Diagnostics;
 #endif
 using Ruzzie.Caching;
@@ -26,7 +26,7 @@ namespace Ruzzie.FuzzyStrings
 #if HAVE_VISUALBASIC_DEVICES
                 ComputerInfo info = new ComputerInfo();
                 bytesOfMemoryAvailable = (long) info.AvailablePhysicalMemory;
-#elif !PORTABLE
+#elif !PORTABLE && HAVE_PROCESS
                 using(Process currentProcess = Process.GetCurrentProcess())
                 {
                     bytesOfMemoryAvailable = currentProcess.MaxWorkingSet.ToInt64() * 16;

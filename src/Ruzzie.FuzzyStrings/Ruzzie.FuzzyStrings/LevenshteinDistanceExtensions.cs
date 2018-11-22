@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Ruzzie.FuzzyStrings
 {
@@ -93,16 +94,19 @@ namespace Ruzzie.FuzzyStrings
             int length = p.Length;
             for (var i = 0; i < length; ++i)
             {
-                //min = Math.Min(min, p[i]);
-                if (min > p[i])
-                {
-                    min = p[i];
-                }
+                min = Math.Min(min, p[i]);
+                //if (min > p[i])
+                //{
+                //    min = p[i];
+                //}
             }
             return min;
         }
 
-        public static int FindMinimumOptimized(int a, int b, int c)
+        #if HAVE_METHODINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        #endif
+        public static int FindMinimumOptimized(in int a, in int b, in int c)
         {
             return Math.Min(a, Math.Min(b, c));
         }
@@ -135,6 +139,9 @@ namespace Ruzzie.FuzzyStrings
                 matrix[0, i] = i;
             }
 
+            const int bZero = 0;
+            const int bOne = 1;
+
             //analyze
             for (var i = 1; i < inputLen; i++)
             {
@@ -142,7 +149,7 @@ namespace Ruzzie.FuzzyStrings
                 for (var j = 1; j < comparedToLen; j++)
                 {
                     char tj = comparedTo[j - 1];
-                    int cost = (si == tj) ? 0 : 1;
+                    var cost = (si == tj) ? bZero : bOne;
 
                     int above = matrix[i - 1, j];
                     int left = matrix[i, j - 1];
@@ -168,7 +175,6 @@ namespace Ruzzie.FuzzyStrings
                     }
                     matrix[i, j] = cell;
                 }
-
             }
             return matrix[inputLen - 1, comparedToLen - 1];
         }

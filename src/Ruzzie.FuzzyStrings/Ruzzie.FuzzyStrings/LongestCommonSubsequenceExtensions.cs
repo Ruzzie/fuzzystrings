@@ -78,7 +78,7 @@ namespace Ruzzie.FuzzyStrings
             return CalculateLongestCommonSubSequence(input, inputLen, comparedToLen, tracks, coef);
         }
 
-#if !PORTABLE
+#if !PORTABLE && HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         private static int SquareOfValuePlusOneMinusSquareOfValue(int k)

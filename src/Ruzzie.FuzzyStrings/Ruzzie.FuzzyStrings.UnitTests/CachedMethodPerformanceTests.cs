@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace Ruzzie.FuzzyStrings.UnitTests
 {
     [TestFixture]
-    [Ignore("Only use when testing algorithms")]
+   // [Ignore("Only use when testing algorithms")]
     public class CachedMethodPerformanceTests
     {
         [Test]
@@ -27,28 +27,27 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         }
 
         private static void AssertCachedMethodIsFasterThanUncachedMethod(Func<string, string> uncachedMethod, Func<string, string> cachedMethod,
-            int numberOfIterationsToPerform, string methodname)
+            int numberOfIterationsToPerform, string methodName)
         {
             //first warmup
             Task<Tuple<double, double>> cachedTask =
-                Task.Run(() => ExecuteMethodWithTimingAverageResults(cachedMethod, numberOfIterationsToPerform));
+                RunTask(cachedMethod, numberOfIterationsToPerform);
             Tuple<double, double> cachedTimings = cachedTask.Result;
 
             Task<Tuple<double, double>> uncachedTask =
-                Task.Run(() => ExecuteMethodWithTimingAverageResults(uncachedMethod, numberOfIterationsToPerform));
+                RunTask(uncachedMethod, numberOfIterationsToPerform);                
             Tuple<double, double> uncachedTimings = uncachedTask.Result;
 
             //now for real
-            cachedTask =
-                Task.Run(() => ExecuteMethodWithTimingAverageResults(cachedMethod, numberOfIterationsToPerform));
+            cachedTask =  RunTask(cachedMethod, numberOfIterationsToPerform);                
             cachedTimings = cachedTask.Result;
 
             uncachedTask =
-                Task.Run(() => ExecuteMethodWithTimingAverageResults(uncachedMethod, numberOfIterationsToPerform));
+                RunTask(uncachedMethod, numberOfIterationsToPerform);
             uncachedTimings = uncachedTask.Result;
 
 
-            Console.WriteLine("Timing results for: " + methodname);
+            Console.WriteLine("Timing results for: " + methodName);
             Console.WriteLine("Uncached Result:   \t Avg ticks: " + uncachedTimings.Item1);
             Console.WriteLine("Cached Result:     \t Avg ticks: " + cachedTimings.Item1);
             Console.WriteLine("Uncached Result:   \t Avg ms: " + uncachedTimings.Item2);
@@ -59,10 +58,21 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Assert.That(cachedTimings.Item2, Is.LessThan(uncachedTimings.Item2));
         }
 
+        private static Task<Tuple<double, double>> RunTask(Func<string, string> cachedMethod, int numberOfIterationsToPerform)
+        {
+#if NET40
+            var task = new Task<Tuple<double, double>>(() => ExecuteMethodWithTimingAverageResults(cachedMethod, numberOfIterationsToPerform));
+            task.Start();
+            return task;
+#else
+            return Task.Run(() => ExecuteMethodWithTimingAverageResults(cachedMethod, numberOfIterationsToPerform));
+#endif
+        }
+
         [Test]
         public void LevenshteinDistanceAlternativeTest()
         {
-            Random random = new Random(Environment.TickCount);
+            Random random = new Random(1337);
 
             int next = random.Next();
             string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures" + next;//.ToLowerInvariant();
@@ -115,7 +125,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string sourceString = "Beast-of-Burden's power and toughness  are each equal to the number of creatures on the battlefield.";
 
             //classic replace method with tolowercase
-            Func<string> regexStrip = () => StringExtensions.Strip(sourceString + random.Next());
+            Func<string> regexStrip = () => StringExtensions.StripWithRegex(sourceString + random.Next());
 
             Func<string> customStrip = () => StringExtensions.StripAlternative(sourceString + random.Next());
 
