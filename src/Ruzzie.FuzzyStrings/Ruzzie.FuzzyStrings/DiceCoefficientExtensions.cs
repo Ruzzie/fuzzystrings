@@ -11,10 +11,10 @@ namespace Ruzzie.FuzzyStrings
     public static class DiceCoefficientExtensions
     {
         private static readonly IFixedSizeCache<string, string[]> BiGramsCache = new FlashCache<string, string[]>(
-            InternalVariables.DefaultCacheItemSizeInMb * 4,
+            InternalVariables.DefaultCacheItemSizeInMb,
             InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes, InternalVariables.AverageStringSizeInBytes + 2);
 
-        private static readonly IFixedSizeCache<string, HashSet<string>> BiGramsAltCache = new FlashCache<string, HashSet<string>>(InternalVariables.DefaultCacheItemSizeInMb * 4,
+        private static readonly IFixedSizeCache<string, HashSet<string>> BiGramsAltCache = new FlashCache<string, HashSet<string>>(InternalVariables.DefaultCacheItemSizeInMb ,
           InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes, InternalVariables.AverageStringSizeInBytes + 2);
 
         private const string SinglePercent = "%";
@@ -33,12 +33,21 @@ namespace Ruzzie.FuzzyStrings
             return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
         }
 
-        public static double DiceCoefficientUncached(this string input, string comparedTo)
+        [Obsolete("Use DiceCoefficientAlternative for the uncached version or DiceCoefficient for the cached version.")]
+        public static double DiceCoefficientOld(this string input, string comparedTo)
         {
             var ngrams = input.ToBiGrams();
             var compareToNgrams = comparedTo.ToBiGrams();
           
             return ngrams.DiceCoefficient(compareToNgrams);
+        }
+
+        public static double DiceCoefficientUncached(this string input, string comparedTo)
+        {
+            var ngrams = input.ToBiGrams();
+            var compareToNgrams = comparedTo.ToUniqueBiGrams();
+            
+            return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
         }
 
         public static double DiceCoefficientAlternative(this string input, string comparedTo)

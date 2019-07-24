@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Ruzzie.FuzzyStrings
 {
@@ -87,7 +88,7 @@ namespace Ruzzie.FuzzyStrings
             return ((2*k) + 1);
         }
 
-        private static LongestCommonSubsequenceResult CalculateLongestCommonSubSequence(string input, int i, int j, LcsDirection[,] tracks, double coef)
+        private static LongestCommonSubsequenceResult CalculateLongestCommonSubSequence(string input, int i, int j, in LcsDirection[,] tracks, double coefficient)
         {
             string subseq = string.Empty;
             //trace the backtracking matrix.
@@ -112,7 +113,7 @@ namespace Ruzzie.FuzzyStrings
                 }
             }
 
-            return new LongestCommonSubsequenceResult(subseq, coef);
+            return new LongestCommonSubsequenceResult(subseq, coefficient);
         }
 
         static readonly LongestCommonSubsequenceResult EmptyResult = default(LongestCommonSubsequenceResult);

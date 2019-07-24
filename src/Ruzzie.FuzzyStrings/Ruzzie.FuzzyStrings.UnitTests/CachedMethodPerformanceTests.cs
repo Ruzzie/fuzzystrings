@@ -245,7 +245,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string stringToFind = "Predominantly sedentary, the species and creatures can be locally nomadic." + next;
 
             //classic replace method with tolowercase
-            Func<double> original = () => (sourceString + random.Next()).DiceCoefficientUncached(stringToFind + random.Next());
+            Func<double> original = () => (sourceString + random.Next()).DiceCoefficientOld(stringToFind + random.Next());
 
             Func<double> alternative = () => (sourceString + random.Next()).DiceCoefficientAlternative(stringToFind + random.Next());
 
