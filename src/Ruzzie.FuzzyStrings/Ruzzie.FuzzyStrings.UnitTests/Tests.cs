@@ -20,30 +20,30 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
     [TestFixture]
     public class Tests
-    {      
+    {
         [Test]
-        [TestCase("test","w",0.078125d)]
-        [TestCase("test","W",0.078125d)]
-        [TestCase("test","w ",0.078125d)]
-        [TestCase("test","W ",0.078125d)]
-        [TestCase("test"," w",0.078125d)]
-        [TestCase("test"," W",0.078125d)]
-        [TestCase("test"," w ",0.078125d)]
-        [TestCase("test"," W ",0.078125d)]     
-        [TestCase("Kjeldoran Elite Guard", "Kjeldoran Elite Guard", StringExtensions.ExactMatchProbability)]        
+        [TestCase("test", "w", 0.059523809523809521d)]
+        [TestCase("test", "W", 0.059523809523809521d)]
+        [TestCase("test", "w ", 0.059523809523809521d)]
+        [TestCase("test", "W ", 0.059523809523809521d)]
+        [TestCase("test", " w", 0.059523809523809521d)]
+        [TestCase("test", " W", 0.059523809523809521d)]
+        [TestCase("test", " w ", 0.059523809523809521d)]
+        [TestCase("test", " W ", 0.059523809523809521d)]
+        [TestCase("Kjeldoran Elite Guard", "Kjeldoran Elite Guard", StringExtensions.ExactMatchProbability)]
         public void IssueTest(string input, string compareTo, double expected)
         {
-            Assert.That(input.FuzzyMatch(compareTo),Is.EqualTo(expected));          
+            Assert.That(input.FuzzyMatch(compareTo), Is.EqualTo(expected));
         }
 
-        [TestCase("Kjeldoran elite", "Kjeldoran Gargoyle", 0.56876095071684585d)]
-        [TestCase("Kjeldoran Gargoyle", "Kjeldoran elite", 0.56876095071684585d)]
-        [TestCase("Kjeldoran elite", "Kjeldoran Elite Guard", 0.71456486550605902d)]
+        [TestCase("Kjeldoran elite", "Kjeldoran Gargoyle", 0.56630225677506774d)]
+        [TestCase("Kjeldoran Gargoyle", "Kjeldoran elite", 0.56630225677506774d)]
+        [TestCase("Kjeldoran elite", "Kjeldoran Elite Guard", 0.71008452873323602d)]
         [TestCase("kjeldoran elite guard", "kjeldoran elite guard", StringExtensions.ExactMatchProbability)]
-        [TestCase("guard elite kjeldoran", "kjeldoran elite guard", 0.7096877533708823d)]
-        [TestCase("guard kjeldoran elite", "kjeldoran elite guard", 0.7096877533708823d)]
-        [TestCase("kjeldoran elite guard master", "kjeldoran elite guard", 0.56233325962812675d)]
-        [TestCase("Grizzled Angler", "Tangle Angler", 0.65827161366500886d)]
+        [TestCase("guard elite kjeldoran", "kjeldoran elite guard", 0.70495849510110475d)]
+        [TestCase("guard kjeldoran elite", "kjeldoran elite guard", 0.70495849510110475d)]
+        [TestCase("kjeldoran elite guard master", "kjeldoran elite guard",  0.55814012072314667d)]
+        [TestCase("Grizzled Angler", "Tangle Angler", 0.65633302805706839d)]
         [TestCase("", "",StringExtensions.ExactMatchProbability)]
         [TestCase("\t\n", "   ", StringExtensions.ExactMatchProbability)]        
         public void TokenizeFuzzyMatch(string input, string compareTo, double expected)
@@ -77,26 +77,26 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Assert.That(input.DiceCoefficientAlternative(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
         }
 
-        [TestCase("Jensn", "Adams", 4)]
+        [TestCase("Jensn", "Adams", 5)]
         [TestCase("Jensn", "Benson", 2)]
-        [TestCase("Jensn", "Geralds", 5)]
+        [TestCase("Jensn", "Geralds", 6)]
         [TestCase("Jensn", "Johannson", 5)]
         [TestCase("Jensn", "Johnson", 3)]
         [TestCase("Jensn", "Jensen", 1)]
         [TestCase("Jensn", "Jordon", 4)]
         [TestCase("Jensn", "Madsen", 4)]
-        [TestCase("Jensn", "Stratford", 8)]
+        [TestCase("Jensn", "Stratford", 9)]
         [TestCase("Jensn", "Wilkins", 6)]
         [TestCase("2130 South Fort Union Blvd.", "2689 East Milkin Ave.", 18)]
         [TestCase("2130 South Fort Union Blvd.", "85 Morrison", 22)]
         [TestCase("2130 South Fort Union Blvd.", "2350 North Main", 18)]
-        [TestCase("2130 South Fort Union Blvd.", "567 West Center Street", 22)]
-        [TestCase("2130 South Fort Union Blvd.", "2130 Fort Union Boulevard", 11)]
+        [TestCase("2130 South Fort Union Blvd.", "567 West Center Street", 23)]
+        [TestCase("2130 South Fort Union Blvd.", "2130 Fort Union Boulevard", 12)]
         [TestCase("2130 South Fort Union Blvd.", "2310 S. Ft. Union Blvd.", 8)]
         [TestCase("2130 South Fort Union Blvd.", "98 West Fort Union", 14)]
-        [TestCase("2130 South Fort Union Blvd.", "Rural Route 2 Box 29", 19)]
-        [TestCase("2130 South Fort Union Blvd.", "PO Box 3487", 22)]
-        [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", 22)]
+        [TestCase("2130 South Fort Union Blvd.", "Rural Route 2 Box 29", 20)]
+        [TestCase("2130 South Fort Union Blvd.", "PO Box 3487", 23)]
+        [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", 23)]
         public void LevenshteinTests(string input, string compareTo, int expected)
         {
             Assert.That(input.LevenshteinDistanceUncached(compareTo), Is.EqualTo(expected));
@@ -169,8 +169,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void LongestCommonSubSequenceTests(string input, string compareTo, double expectedDouble, string expectedSequence)
         {
             LongestCommonSubsequenceResult result = input.LongestCommonSubsequence(compareTo);
-            Assert.That(result.Coeffecient, Is.EqualTo(expectedDouble).Within(0.000009));
-            Assert.That(input.LongestCommonSubsequence(compareTo,false,false).Coeffecient, Is.EqualTo(expectedDouble).Within(0.000009));
+            Assert.That(result.Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
+            Assert.That(input.LongestCommonSubsequence(compareTo,false,false).Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
             Assert.That(result.LongestSubsequence.ToUpperInvariant(), Is.EqualTo(expectedSequence.ToUpperInvariant()));
         }
        
@@ -253,6 +253,17 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void CalculateLevenCoefficient(string input, string compareTo, double expected)
         {
             Assert.That(StringExtensions.CalculateLevenshteinDistanceCoefficientForCompositeCoefficient(input,compareTo),Is.EqualTo(expected));
-        }          
+        }      
+        
+        [Theory]
+        [TestCase("kitten", "sitting", 3)]
+        [TestCase("78135", "75130", 2)]
+        [TestCase("78135x", "75130x", 2)]
+        public void LevenshteinDistancePreciseTests(string input, string match, int expectedResult)
+        {
+            var result = input.LevenshteinDistance(match);
+            var msg = $"LevenshteinDistance of \"{match}\" against \"{input}\" was {result}, expecting {expectedResult}.";
+            Assert.AreEqual(expectedResult, result, double.Epsilon, msg);
+        }
     }
 }

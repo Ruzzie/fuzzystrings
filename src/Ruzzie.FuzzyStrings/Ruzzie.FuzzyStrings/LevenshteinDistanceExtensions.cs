@@ -32,8 +32,8 @@ namespace Ruzzie.FuzzyStrings
                 comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);
             }
 
-            int inputLen = input.Length;
-            int comparedToLen = comparedTo.Length;
+            int inputLen = input.Length + 1;
+            int comparedToLen = comparedTo.Length + 1;
 
             int[,] matrix = new int[inputLen, comparedToLen];
 
