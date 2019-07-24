@@ -123,7 +123,7 @@ namespace Ruzzie.FuzzyStrings
         /// <param name="comparedTo"></param>
         /// <param name="caseSensitive"></param>
         /// <param name="includeLongestSubsequenceInResult"></param>
-        /// <returns>Returns a Tuple of the sub sequence string and the match coeficient.</returns>
+        /// <returns>Returns a Tuple of the sub sequence string and the match coefficient.</returns>
         public static LongestCommonSubsequenceResult LongestCommonSubsequenceUncached(this string input, string comparedTo, bool caseSensitive = false,
              bool includeLongestSubsequenceInResult = true)
         {
@@ -197,23 +197,22 @@ namespace Ruzzie.FuzzyStrings
 
     public struct LongestCommonSubsequenceResult
     {
-        public LongestCommonSubsequenceResult(string longestSubsequence, double coeffecient) : this()
+        public LongestCommonSubsequenceResult(string longestSubsequence, double coefficient) : this()
         {
             LongestSubsequence = longestSubsequence;
-            Coeffecient = coeffecient;
+            Coefficient = coefficient;
             WithStringResult = true;
         }
 
-        public LongestCommonSubsequenceResult(double coeffecient) : this()
+        public LongestCommonSubsequenceResult(double coefficient) : this()
         {
-            LongestSubsequence = null;
-            Coeffecient = coeffecient;
+            LongestSubsequence = string.Empty;
+            Coefficient = coefficient;
             WithStringResult = false;
         }
 
-        public bool WithStringResult;
-        public string LongestSubsequence;
-        public double Coeffecient;
+        public readonly bool WithStringResult;
+        public readonly string LongestSubsequence;
+        public readonly double Coefficient;
     }
-
 }

@@ -220,7 +220,7 @@ namespace Ruzzie.FuzzyStrings
                 }
             }
             double mpCoefficient = matchCount == 0 ? 0.0 : matchCount / 4.0;
-            double avgCoefficient = (dice + lcs.Coeffecient + levenCoefficient + mpCoefficient) / 4.0;
+            double avgCoefficient = (dice + lcs.Coefficient + levenCoefficient + mpCoefficient) / 4.0;
             return avgCoefficient;
         }
 
