@@ -31,7 +31,7 @@ namespace Ruzzie.FuzzyStrings
         /// </summary>
         public static double FuzzyMatchTokens(this string strA, string strB, bool caseSensitive = true)
         {
-            return FuzzyMatchTokens(strA, strB, DefaultWhitespaceTokenizer, caseSensitive);
+            return FuzzyMatchTokens(strA, ref strB, DefaultWhitespaceTokenizer, caseSensitive);
         }
 
         public static readonly IStringTokenizer DefaultWhitespaceTokenizer = new WhitespaceTokenizer();
@@ -40,7 +40,7 @@ namespace Ruzzie.FuzzyStrings
         /// Tokenize the strings and returns an average probability by matching the tokens divided by the number of comparisons.
         /// Contrary to FuzzyMatch, which also matches 'words' this method does not take distance and order into account.
         /// </summary>
-        public static double FuzzyMatchTokens(this string strA, string strB, IStringTokenizer tokenizer, bool caseSensitive = true)
+        public static double FuzzyMatchTokens(this string strA, ref string strB, IStringTokenizer tokenizer, bool caseSensitive = true)
         {
             if (tokenizer == null)
             {
@@ -141,8 +141,9 @@ namespace Ruzzie.FuzzyStrings
                             indexDistance = Math.Abs(i - x);
                         }
                     }
-                    double distanceWeight = indexDistance == 0 ? 1.0 : 1.0 - (indexDistance/((double) partsALength));
-                    weightedHighCoefficientsSum += high*distanceWeight;
+
+                    double distanceWeight = indexDistance == 0 ? 1.0 : 1.0 - (indexDistance / ((double) partsALength));
+                    weightedHighCoefficientsSum += high * distanceWeight;
                 }
                 double avgWeightedHighCoefficient = weightedHighCoefficientsSum / partsALength;
                 return avgWeightedHighCoefficient < 0.999999 ? avgWeightedHighCoefficient : FuzzyMatchMaxProbability; //fudge factor

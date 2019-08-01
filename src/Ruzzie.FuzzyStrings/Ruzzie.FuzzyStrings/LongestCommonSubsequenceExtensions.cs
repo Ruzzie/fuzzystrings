@@ -4,7 +4,6 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Ruzzie.FuzzyStrings
 {
@@ -30,21 +29,25 @@ namespace Ruzzie.FuzzyStrings
             LcsDirection[,] tracks = new LcsDirection[inputLen + 1, comparedToLen + 1];
             int[,] w = new int[inputLen + 1, comparedToLen + 1];
 
-            for (int i = 0; i <= inputLen; ++i)
-            {
-                // lcs[i, 0] = 0;  //intial value is always 0, (managed language ;))
-                tracks[i, 0] = LcsDirection.North;
-            }
-            for (int j = 0; j <= comparedToLen; ++j)
-            {
-                //lcs[0, j] = 0;  //intial value is always 0, (managed language ;))
-                tracks[0, j] = LcsDirection.West;
-            }
-
+            //for (int i = 0; i <= inputLen; ++i)
+            //{
+            //    // lcs[i, 0] = 0;  //intial value is always 0, (managed language ;))
+            //    tracks[i, 0] = LcsDirection.North;
+            //}
+            //for (int j = 0; j <= comparedToLen; ++j)
+            //{
+            //    //lcs[0, j] = 0;  //intial value is always 0, (managed language ;))
+            //    tracks[0, j] = LcsDirection.West;
+            //}
+            // tracks[0, 0] = LcsDirection.North;
+            tracks[0, 0] = LcsDirection.West;
             for (int i = 1; i <= inputLen; ++i)
             {
+                tracks[i, 0] = LcsDirection.North; //Initialize default
                 for (int j = 1; j <= comparedToLen; ++j)
                 {
+                    tracks[0, j] = LcsDirection.West; //Initialize default
+
                     if (input[i - 1] == (comparedTo[j - 1]))
                     {
                         int k = w[i - 1, j - 1];
@@ -90,7 +93,10 @@ namespace Ruzzie.FuzzyStrings
 
         private static LongestCommonSubsequenceResult CalculateLongestCommonSubSequence(string input, int i, int j, in LcsDirection[,] tracks, double coefficient)
         {
-            string subseq = string.Empty;
+            //string subseq = string.Empty;
+            var inputLength = input.Length;
+            char[] subSequence =  new char[inputLength];
+            int subsequenceLength = 0;
             //trace the backtracking matrix.
             while (i > 0 || j > 0)
             {
@@ -98,22 +104,21 @@ namespace Ruzzie.FuzzyStrings
                 {
                     i--;
                     j--;
-                    subseq = input[i] + subseq;
+                    //subseq = input[i] + subseq;
+                    subSequence[inputLength-subsequenceLength -1] = input[i];
+                    subsequenceLength++;
                     //Trace.WriteLine(i + " " + input1[i] + " " + j);
                 }
-
                 else if (tracks[i, j] == LcsDirection.North)
                 {
                     i--;
                 }
-
                 else if (tracks[i, j] == LcsDirection.West)
                 {
                     j--;
                 }
             }
-
-            return new LongestCommonSubsequenceResult(subseq, coefficient);
+            return new LongestCommonSubsequenceResult(new string(subSequence, inputLength-subsequenceLength, subsequenceLength), coefficient);
         }
 
         static readonly LongestCommonSubsequenceResult EmptyResult = default(LongestCommonSubsequenceResult);
