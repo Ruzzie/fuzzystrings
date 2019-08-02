@@ -46,6 +46,8 @@ namespace Ruzzie.FuzzyStrings
         private static readonly IFixedSizeCache<string, string> Cache = new FlashCache<string, string>(InternalVariables.DefaultCacheItemSizeInMb,
             InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes);
 
+        private static readonly string[] MegaphonesToSkipAtStartOfWord = new[] {strGN, strKN, strPN, strWR, strPS};
+
 
         public static string ToDoubleMetaphone(this string input)
         {
@@ -70,7 +72,7 @@ namespace Ruzzie.FuzzyStrings
                 || (input.IndexOf(strWITZ, StringComparison.OrdinalIgnoreCase) > -1);
 
             //skip these when at start of word
-            if (workingString.StartsWith(StringComparison.OrdinalIgnoreCase, strGN, strKN, strPN, strWR, strPS))
+            if (workingString.StartsWith(StringComparison.OrdinalIgnoreCase, MegaphonesToSkipAtStartOfWord))
             {
                 current += 1;
             }
@@ -1188,7 +1190,22 @@ namespace Ruzzie.FuzzyStrings
                 }                              
             }
             return false;
-        }       
+        }
+
+        static bool StringAt(this string self, int startIndex, string value)
+        {
+            if (startIndex < 0)
+            {
+                startIndex = 0;
+            }
+
+            if (startIndex > 0)
+            {
+                return self.Substring(startIndex).ContainsString(value);
+            }
+
+            return self.ContainsString(value);
+        }
 
         private class MetaphoneData
         {

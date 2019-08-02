@@ -155,9 +155,9 @@ namespace Ruzzie.FuzzyStrings
             int[,] lcs = new int[inputLen + 1, comparedToLen + 1];
             int[,] w = new int[inputLen + 1, comparedToLen + 1];
 
-            for (int i = 1; i <= inputLen; ++i)
+            for (int i = 1; i <= inputLen; i++)
             {
-                for (int j = 1; j <= comparedToLen; ++j)
+                for (int j = 1; j <= comparedToLen; j++)
                 {
                     int currentLcs;
                     int currentK;

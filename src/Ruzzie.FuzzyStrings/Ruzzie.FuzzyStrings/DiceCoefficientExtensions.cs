@@ -142,7 +142,19 @@ namespace Ruzzie.FuzzyStrings
             //   from Jackson, return %j ja ac ck ks so on n#
             //   from Main, return #m ma ai in n#
             input = string.Concat(SinglePercent, input, SinglePound);
-            return new HashSet<string>(ToNGrams(input, 2));
+
+            #if NET472
+            var ngramsUnique = new HashSet<string>(input.Length);
+            #else
+            var ngramsUnique = new HashSet<string>();
+            #endif
+            int itemsCount = input.Length - 1;
+            for (int i = 0; i < itemsCount; i++)
+            {
+                ngramsUnique.Add(input.Substring(i, 2));
+            }
+            //return ngrams;
+            return ngramsUnique;
         }
       
     }
