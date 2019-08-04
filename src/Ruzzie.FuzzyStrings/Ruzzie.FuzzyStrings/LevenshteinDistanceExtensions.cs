@@ -50,10 +50,10 @@ namespace Ruzzie.FuzzyStrings
             //analyze
             for (var i = 1; i < inputLen; i++)
             {
-                ushort si = input[i - 1];
+                var si = input[i - 1];
                 for (var j = 1; j < comparedToLen; j++)
                 {
-                    ushort tj = comparedTo[j - 1];
+                    var tj = comparedTo[j - 1];
                     int cost = (si == tj) ? 0 : 1;
 
                     int above = matrix[i - 1, j];
@@ -78,6 +78,7 @@ namespace Ruzzie.FuzzyStrings
                             cell = trans;
                         }
                     }
+
                     matrix[i, j] = cell;
                 }
             }
@@ -147,10 +148,8 @@ namespace Ruzzie.FuzzyStrings
                     char tj = comparedTo[j - 1];
                     var cost = (si == tj) ? bZero : bOne;
 
-                    int above = matrix[i - 1, j];
-                    int left = matrix[i, j - 1];
-                    int diag = matrix[i - 1, j - 1];
-                    int cell = FindMinimumOptimized(above + 1, left + 1, diag + cost);
+                    int cell = FindMinimumOptimized(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1,
+                        matrix[i - 1, j - 1] + cost);
 
                     //transposition
                     if (i > 1 && j > 1)

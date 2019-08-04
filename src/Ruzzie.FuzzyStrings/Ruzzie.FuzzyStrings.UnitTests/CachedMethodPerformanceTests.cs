@@ -98,6 +98,34 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         }
 
         [Test]
+        public void LongestCommonSubsequenceAlternativeWithoutBacktrackingTest()
+        {
+            Random random = new Random(1337);
+
+            int next = random.Next();
+            string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures" + next;//.ToLowerInvariant();
+            string stringToFind = "to the number of creatures" + next;
+
+            //classic replace method with tolowercase
+            Func<LongestCommonSubsequenceResult> original =() => (sourceString + next).LongestCommonSubsequenceUncached(stringToFind + next,false,true);
+
+            Func<LongestCommonSubsequenceResult> alternative =  () => (sourceString + next).LongestCommonSubsequenceUncached(stringToFind + next, false, false);
+
+            var numberOfTimesToExecute = 500;
+
+            //warmup
+            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(250, alternative);
+            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(250, original);
+
+            //execute
+            alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
+            originalTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, original);
+
+            Console.WriteLine("Original timing: " + originalTimings.TotalMilliseconds);
+            Console.WriteLine("Alternative timing: " + alternativeTimings.TotalMilliseconds);
+        }
+
+        [Test]
         public void StringContainsAlternativeTest()
         {
             Random random = new Random();

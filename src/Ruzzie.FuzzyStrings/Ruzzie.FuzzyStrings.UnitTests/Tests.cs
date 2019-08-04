@@ -173,7 +173,35 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Assert.That(input.LongestCommonSubsequence(compareTo,false,false).Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
             Assert.That(result.LongestSubsequence.ToUpperInvariant(), Is.EqualTo(expectedSequence.ToUpperInvariant()));
         }
-       
+
+        [TestCase("Jensn", "Adams", 0.04000d,"s")]
+        [TestCase("Adams", "Jensn", 0.04000d,"s")]
+        [TestCase("Jensn", "Benson", 0.33333d, "ensn")]
+        [TestCase("Jensn", "Geralds", 0.05714d, "es")]
+        [TestCase("Jensn", "Johannson", 0.08889d,"jnsn")]
+        [TestCase("Jensn", "Johnson", 0.17143d, "jnsn")]
+        [TestCase("Jensn", "Jensen", 0.56667d, "jensn")]
+        [TestCase("Jensn", "Jordon", 0.06667d, "jn")]
+        [TestCase("Jensn", "Madsen", 0.13333d,"en")]
+        [TestCase("Jensn", "Stratford", 0.02222d, "s")]
+        [TestCase("Jensn", "Wilkins", 0.11429d, "ns")]
+        [TestCase("2130 South Fort Union Blvd.", "2689 East Milkin Ave.", 0.0211640211640212, "2 st in v.")]
+        [TestCase("2689 East Milkin Ave.", "2130 South Fort Union Blvd.", 0.0211640211640212, "2 st in v.")]
+        [TestCase("2130 South Fort Union Blvd.", "85 Morrison", 0.0202020202020202, " son")]
+        [TestCase("2130 South Fort Union Blvd.", "2350 North Main", 0.0444444444444444, "230 oth in")]
+        [TestCase("2130 South Fort Union Blvd.", "567 West Center Street", 0.0101010101010101, " st t ")]
+        [TestCase("2130 South Fort Union Blvd.", "2130 Fort Union Boulevard", 0.254814814814815, "2130 fort union blvd")]
+        [TestCase("2130 South Fort Union Blvd.", "2310 S. Ft. Union Blvd.", 0.257648953301127, "230 s ft union blvd.")]
+        [TestCase("2130 South Fort Union Blvd.", "98 West Fort Union", 0.255144032921811, " st fort union")]
+        [TestCase("2130 South Fort Union Blvd.", "Rural Route 2 Box 29", 0.0259259259259259, " out  o ")]
+        [TestCase("2130 South Fort Union Blvd.", "PO Box 3487", 0.0134680134680135, "o o ")]
+        [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", 0.0138888888888889, "3 hrvd")]
+        public void LongestCommonSubSequenceUncachedNoBackTrackingTests(string input, string compareTo, double expectedDouble, string expectedSequence)
+        {
+            LongestCommonSubsequenceResult result = input.LongestCommonSubsequenceUncached(compareTo, false, false);
+            Assert.That(result.Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
+            Assert.That(input.LongestCommonSubsequence(compareTo,false,true).Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
+        }
 
         [TestCase("Jensn", "Adams", false)]
         [TestCase("Jensn", "Benson", false)]

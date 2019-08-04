@@ -29,17 +29,7 @@ namespace Ruzzie.FuzzyStrings
             LcsDirection[,] tracks = new LcsDirection[inputLen + 1, comparedToLen + 1];
             int[,] w = new int[inputLen + 1, comparedToLen + 1];
 
-            //for (int i = 0; i <= inputLen; ++i)
-            //{
-            //    // lcs[i, 0] = 0;  //intial value is always 0, (managed language ;))
-            //    tracks[i, 0] = LcsDirection.North;
-            //}
-            //for (int j = 0; j <= comparedToLen; ++j)
-            //{
-            //    //lcs[0, j] = 0;  //intial value is always 0, (managed language ;))
-            //    tracks[0, j] = LcsDirection.West;
-            //}
-            // tracks[0, 0] = LcsDirection.North;
+
             tracks[0, 0] = LcsDirection.West;
             for (int i = 1; i <= inputLen; ++i)
             {
@@ -152,45 +142,52 @@ namespace Ruzzie.FuzzyStrings
             int inputLen = input.Length;
             int comparedToLen = comparedTo.Length;
 
-            int[,] lcs = new int[inputLen + 1, comparedToLen + 1];
-            int[,] w = new int[inputLen + 1, comparedToLen + 1];
-
-            for (int i = 1; i <= inputLen; i++)
+            LcsTrack[,] w = new LcsTrack[inputLen + 1, comparedToLen + 1];
+            
+            for (int i = 1; i <= inputLen; ++i)
             {
-                for (int j = 1; j <= comparedToLen; j++)
+                for (int j = 1; j <= comparedToLen; ++j)
                 {
                     int currentLcs;
                     int currentK;
                     if (input[i - 1] == (comparedTo[j - 1]))
                     {
-                        int k = w[i - 1, j - 1];
-                        currentLcs = lcs[i - 1, j - 1] + SquareOfValuePlusOneMinusSquareOfValue(k);
+                        int k = w[i - 1, j - 1].CountValue;
+                        currentLcs = w[i - 1, j - 1].LcsValue + SquareOfValuePlusOneMinusSquareOfValue(k);
                         currentK = k + 1;
                     }
                     else
                     {
-                        currentLcs = lcs[i - 1, j - 1];
-                        currentK = w[i, j];
+                        currentLcs = w[i - 1, j - 1].LcsValue;
+                        currentK = w[i, j].CountValue;
                     }
 
-                    int tmpLcs = Math.Max(lcs[i - 1, j], lcs[i, j - 1]);
+                    var tmpLcs = Math.Max(w[i - 1, j].LcsValue, w[i, j - 1].LcsValue);
 
                     if (tmpLcs >= currentLcs)
                     {
                         currentK = 0;
                         currentLcs = tmpLcs;
-                    }                   
+                    }
 
-                    lcs[i, j] = currentLcs;
-                    w[i, j] = currentK;
+                    var currentLcsTrack = w[i, j];
+                    currentLcsTrack.LcsValue = currentLcs;
+                    currentLcsTrack.CountValue = currentK;
+                    w[i, j] = currentLcsTrack;
                 }
             }
 
-            double p = lcs[inputLen, comparedToLen];
+            double p = w[inputLen, comparedToLen].LcsValue;
             double coef = p / (inputLen * comparedToLen);
 
             return new LongestCommonSubsequenceResult(coef);
-        }      
+        }
+    }
+
+    internal struct LcsTrack
+    {
+        public int LcsValue;
+        public int CountValue;
     }
 
     internal enum LcsDirection
