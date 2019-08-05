@@ -99,8 +99,8 @@ namespace Ruzzie.FuzzyStrings
 
         public static double FuzzyMatchUncached(this string strA, string strB, bool caseSensitive = true)
         {
-            string localA = StripAlternative(strA.Trim());
-            string localB = StripAlternative(strB.Trim());
+            string localA = StripAlternativeV2(strA.Trim());
+            string localB = StripAlternativeV2(strB.Trim());
             if (!caseSensitive)
             {                
                 if (string.Equals(localA, localB, StringComparison.OrdinalIgnoreCase))
@@ -188,7 +188,54 @@ namespace Ruzzie.FuzzyStrings
                 // ReSharper restore RedundantCast
             }
             return b.ToString();
-        }      
+        }     
+        
+        /// <summary>
+        /// Strips string of characters that are not [^a-zA-Z0-9 -]*
+        /// </summary>
+        /// <param name="str">The string to strip</param>
+        /// <returns>The stripped string</returns>
+        public static string StripAlternativeV2(string str)
+        {
+            int length = str?.Length ?? 0;
+           
+            if(length == 0)
+            {
+                return string.Empty;
+            }
+
+            unsafe
+            {
+                int appendIndex = 0;
+                char* buffer = stackalloc char[length];
+
+                for (int i = 0; i < length; ++i)
+                {
+                    char c = str[i];
+                    // ReSharper disable RedundantCast
+                    if (97 <= (int) c && (int) c <= 122)//a-z
+                    {
+                        buffer[appendIndex] = c;
+                        appendIndex++;
+                    } else if (65 <= (int) c && (int) c <= 90) //A-Z
+                    {
+                        buffer[appendIndex] = c;
+                        appendIndex++;
+                    } else if (48 <= (int) c && (int) c <= 57) //0-9
+                    {
+                        buffer[appendIndex] = c;
+                        appendIndex++;
+                    }
+                    else if (32 == (int) c || 45 == (int)c)//space, -
+                    {
+                        buffer[appendIndex] = c;
+                        appendIndex++;
+                    }
+                    // ReSharper restore RedundantCast
+                }
+                return new string(buffer, 0, appendIndex);
+            }
+        }  
 
         public static bool ContainsString(this string input, string stringToFind)
         {

@@ -152,6 +152,10 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             string sourceString = "Beast-of-Burden's power and toughness  are each equal to the number of creatures on the battlefield.";
 
+            //warmup
+            StringExtensions.StripWithRegex(sourceString + random.Next());
+            StringExtensions.StripAlternative(sourceString + random.Next());
+
             //classic replace method with tolowercase
             Func<string> regexStrip = () => StringExtensions.StripWithRegex(sourceString + random.Next());
 
@@ -165,6 +169,29 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Console.WriteLine("Custom timing: " + alternativeStripTiming.TotalMilliseconds);
         }
 
+        [Test]
+        public void StripAlternativeV2Tests()
+        {
+            Random random = new Random();
+
+            string sourceString = "Beast-of-Burden's power and toughness  are each equal to the number of creatures on the battlefield.";
+
+            //warmup
+            StringExtensions.StripAlternative(sourceString + random.Next());
+            StringExtensions.StripAlternativeV2(sourceString + random.Next());
+
+            //classic replace method with tolowercase
+            Func<string> altStrip = () => StringExtensions.StripAlternative(sourceString + random.Next());
+
+            Func<string> altv2String = () => StringExtensions.StripAlternativeV2(sourceString + random.Next());
+
+            var numberOfTimesToExecute = 10000;
+            TimeSpan altv1Timing = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, altStrip);
+            TimeSpan altv2Timing = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, altv2String);
+
+            Console.WriteLine("Alt timing:  " + altv1Timing.TotalMilliseconds);
+            Console.WriteLine("Altv2 timing: " + altv2Timing.TotalMilliseconds);
+        }
 
         [Test]
         public void StringAnyAlternativeTest()
@@ -172,7 +199,6 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures on the battlefield";//.ToLowerInvariant();
             string stringToFind = "to the number of creatures";
 
-            //classic replace method with tolowercase
             Func<bool> classicContains = () => sourceString.ToLowerInvariant().Contains(stringToFind.ToLowerInvariant());
 
             Func<bool> alternativeContains = () => sourceString.AnyString(stringToFind);

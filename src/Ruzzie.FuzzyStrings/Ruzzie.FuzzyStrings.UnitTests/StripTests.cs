@@ -14,6 +14,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         {
             Assert.That(StringExtensions.StripWithRegex(input), Is.EqualTo(expected));
             Assert.That(StringExtensions.StripAlternative(input), Is.EqualTo(StringExtensions.StripWithRegex(input)));
+            Assert.That(StringExtensions.StripAlternativeV2(input), Is.EqualTo(StringExtensions.StripAlternative(input)));
         }
 
         [Test]
