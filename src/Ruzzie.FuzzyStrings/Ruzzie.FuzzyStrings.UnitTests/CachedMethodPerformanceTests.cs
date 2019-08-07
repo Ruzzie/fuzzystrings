@@ -298,12 +298,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures" + next;
             string stringToFind = "Predominantly sedentary, the species and creatures can be locally nomadic." + next;
 
-            //classic replace method with tolowercase
-            Func<double> original = () => (sourceString + random.Next()).DiceCoefficientOld(stringToFind + random.Next());
+            Func<double> original = () => (sourceString + random.Next()).DiceCoefficientAlternative(stringToFind + random.Next());
 
-            Func<double> alternative = () => (sourceString + random.Next()).DiceCoefficientAlternative(stringToFind + random.Next());
+            Func<double> alternative = () => (sourceString + random.Next()).DiceCoefficientAlternativeV2(stringToFind + random.Next());
 
-            var numberOfTimesToExecute = 1000;
+            var numberOfTimesToExecute = 100000;
 
             //warmup
             TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);

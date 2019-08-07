@@ -33,29 +33,106 @@ namespace Ruzzie.FuzzyStrings
             return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
         }
 
-        [Obsolete("Use DiceCoefficientAlternative for the uncached version or DiceCoefficient for the cached version.")]
-        public static double DiceCoefficientOld(this string input, string comparedTo)
-        {
-            var ngrams = input.ToBiGrams();
-            var compareToNgrams = comparedTo.ToBiGrams();
-          
-            return ngrams.DiceCoefficient(compareToNgrams);
-        }
-
-        public static double DiceCoefficientUncached(this string input, string comparedTo)
-        {
-            var ngrams = input.ToBiGrams();
-            var compareToNgrams = comparedTo.ToUniqueBiGrams();
-            
-            return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
-        }
-
         public static double DiceCoefficientAlternative(this string input, string comparedTo)
         {
             var ngrams = input.ToBiGrams();
             var compareToNgrams = comparedTo.ToUniqueBiGrams();
 
             return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
+        }
+
+        public static double DiceCoefficientAlternativeV2(this string input, string comparedTo)
+        {
+            
+            //To Bigrams
+            input = string.Concat(SinglePercent, input, SinglePound);
+            int inputNgramsLength = input.Length - 1;
+
+            
+            comparedTo = string.Concat(SinglePercent, comparedTo, SinglePound);
+            int comparedToNgramsLength = comparedTo.Length - 1;
+
+            unsafe
+            {
+                BiGram* inputNgrams = stackalloc BiGram[inputNgramsLength];
+               // var lastComparedToIndexCreated = 0;
+
+                fixed (char* inputPtr = input)
+                {
+                    for (int i = 0; i < inputNgramsLength; i++)
+                    {
+                        inputNgrams[i] = new BiGram(inputPtr, i);
+
+                    }
+                }
+
+
+                BiGram* comparedToNgrams = stackalloc BiGram[comparedToNgramsLength];
+
+                fixed (char* comparedToPtr = comparedTo)
+                {
+                    for (int i = 0; i < comparedToNgramsLength; i++)
+                    {
+                        comparedToNgrams[i] = new BiGram(comparedToPtr, i); 
+                    }
+                }
+
+                var matches = 0;
+                //Now see if there are matches
+                for (int i = 0; i < inputNgramsLength; i++)
+                {
+                    for (int j = 0; j < comparedToNgramsLength; j++)
+                    {
+                        if (inputNgrams[i].Value == comparedToNgrams[j].Value)
+                        {
+                            matches++;
+                            break;
+                        }
+                    }
+                }
+
+                if (matches == 0)
+                {
+                    return 0.0d;
+                }
+                double totalBigrams = inputNgramsLength + comparedToNgramsLength;
+                return (2 * matches) / totalBigrams;
+            }
+        }
+
+        private readonly struct BiGram : IEquatable<BiGram>
+        {
+            public readonly int Value;
+            public unsafe BiGram(char* value, int startIndex)
+            {
+                Value = value[startIndex] << 16;
+                Value |= value[startIndex + 1];
+            }
+
+            public bool Equals(BiGram other)
+            {
+                return Value == other.Value;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is BiGram other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return Value;
+            }
+
+            public static bool operator ==(BiGram left, BiGram right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(BiGram left, BiGram right)
+            {
+                return !left.Equals(right);
+            }
         }
 
         private static double DiceCoefficientAlternative(this string[] nGrams, HashSet<string> compareToNGrams, int compareToLength)
@@ -79,32 +156,6 @@ namespace Ruzzie.FuzzyStrings
             return (2 * matches) / totalBigrams;
         }
 
-        /// <summary>
-        ///     Dice Coefficient used to compare nGrams arrays produced in advance.
-        /// </summary>
-        /// <param name="nGrams"></param>
-        /// <param name="compareToNGrams"></param>
-        /// <returns></returns>
-        private static double DiceCoefficient(this string[] nGrams, string[] compareToNGrams)
-        {
-            int matches = 0;
-            int nGramsLength = nGrams.Length;
-
-            for (int i = 0; i < nGramsLength; i++)
-            {                               
-                if (Array.IndexOf(compareToNGrams, nGrams[i]) != -1/*compareToNGrams.Contains(nGrams[i])*/)
-                {
-                    ++matches;
-                }
-            }
-            if (matches == 0)
-            {
-                return 0.0d;
-            }
-            double totalBigrams = nGramsLength + compareToNGrams.Length;
-            //Console.WriteLine("Original comparetoLen: "+ compareToNGrams.Length);
-            return (2*matches)/totalBigrams;
-        }
 
         private static string[] ToBiGrams(this string input)
         {
