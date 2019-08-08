@@ -6,10 +6,10 @@ namespace Ruzzie.FuzzyStrings
 {
     public static class DiceCoefficientExtensions
     {
-        private static readonly IFixedSizeCache<string, double> DiceCoefficientCaseInsensitiveCache = new FlashCache<string, double>(
-            InternalVariables.DefaultCacheItemSizeInMb,
-            InternalVariables.StringComparerForCacheKey,
-            InternalVariables.AverageStringSizeInBytes);
+        //private static readonly IFixedSizeCache<string, double> DiceCoefficientCaseInsensitiveCache = new FlashCache<string, double>(
+        //    InternalVariables.DefaultCacheItemSizeInMb,
+        //    InternalVariables.StringComparerForCacheKey,
+        //    InternalVariables.AverageStringSizeInBytes);
 
         private const string SinglePercent = "%";
         private const string SinglePound = "#";
@@ -19,8 +19,9 @@ namespace Ruzzie.FuzzyStrings
 
         public static double DiceCoefficient(this string input, string comparedTo)
         {
-            return DiceCoefficientCaseInsensitiveCache.GetOrAdd(string.Concat(input, comparedTo),
-                key => input.DiceCoefficientAlternativeV2(comparedTo));
+            //return DiceCoefficientCaseInsensitiveCache.GetOrAdd(string.Concat(input, comparedTo),
+            //    key => input.DiceCoefficientAlternativeV2(comparedTo));
+            return DiceCoefficientAlternativeV2(input, comparedTo);
         }
 
         public static double DiceCoefficientAlternative(this string input, string comparedTo)

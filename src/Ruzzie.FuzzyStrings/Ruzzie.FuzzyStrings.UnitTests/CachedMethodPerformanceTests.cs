@@ -79,11 +79,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string stringToFind = "to the number of creatures" + next;
 
             //classic replace method with tolowercase
-            Func<int> original = () => (sourceString + next).LevenshteinDistanceUncached(stringToFind + next);
+            Func<int> original = () => (sourceString + next).LevenshteinDistanceUncachedAlternative(stringToFind + next);
 
-            Func<int> alternative = () => (sourceString + next).LevenshteinDistanceUncachedAlternative(stringToFind + next);
+            Func<int> alternative = () => (sourceString + next).LevenshteinDistanceUncachedAlternativeV2(stringToFind + next);
 
-            var numberOfTimesToExecute = 500;
+            var numberOfTimesToExecute = 1000;
 
             //warmup
             TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(250, alternative);

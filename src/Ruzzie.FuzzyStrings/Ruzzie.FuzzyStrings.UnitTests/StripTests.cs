@@ -51,8 +51,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase(1,1,1,1)]
         public void FindMinumumOptimized(int a, int b, int c, int expected)
         {            
-            Assert.That(LevenshteinDistanceExtensions.FindMinimumOptimized(a,b,c), Is.EqualTo(expected));
-            Assert.That(LevenshteinDistanceExtensions.FindMinimum(a,b,c), Is.EqualTo(expected));
+            Assert.That(LevenshteinDistanceExtensions.Min(a,b,c), Is.EqualTo(expected));
         }
     }
 }

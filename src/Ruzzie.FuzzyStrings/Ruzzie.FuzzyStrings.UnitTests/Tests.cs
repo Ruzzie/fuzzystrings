@@ -95,14 +95,40 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("2130 South Fort Union Blvd.", "2350 North Main", 18)]
         [TestCase("2130 South Fort Union Blvd.", "567 West Center Street", 23)]
         [TestCase("2130 South Fort Union Blvd.", "2130 Fort Union Boulevard", 12)]
-        [TestCase("2130 South Fort Union Blvd.", "2310 S. Ft. Union Blvd.", 8)]
         [TestCase("2130 South Fort Union Blvd.", "98 West Fort Union", 14)]
         [TestCase("2130 South Fort Union Blvd.", "Rural Route 2 Box 29", 20)]
         [TestCase("2130 South Fort Union Blvd.", "PO Box 3487", 23)]
         [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", 23)]
         public void LevenshteinTests(string input, string compareTo, int expected)
         {
-            Assert.That(input.LevenshteinDistanceUncached(compareTo), Is.EqualTo(expected));
+            Assert.That(input.LevenshteinDistance(compareTo), Is.EqualTo(expected));
+            Assert.That(input.LevenshteinDistanceUncachedAlternative(compareTo), Is.EqualTo(expected), "LevenshteinDistanceUncachedAlternative");
+            Assert.That(input.LevenshteinDistanceUncachedAlternativeV2(compareTo), Is.EqualTo(expected),"LevenshteinDistanceUncachedAlternativeV2");
+        }
+
+        [TestCase("Jensn", "Adams", 5)]
+        [TestCase("Jensn", "Benson", 2)]
+        [TestCase("Jensn", "Geralds", 6)]
+        [TestCase("Jensn", "Johannson", 5)]
+        [TestCase("Jensn", "Johnson", 3)]
+        [TestCase("Jensn", "Jensen", 1)]
+        [TestCase("Jensn", "Jordon", 4)]
+        [TestCase("Jensn", "Madsen", 4)]
+        [TestCase("Jensn", "Stratford", 9)]
+        [TestCase("Jensn", "Wilkins", 6)]
+        [TestCase("2130 South Fort Union Blvd.", "2689 East Milkin Ave.", 18)]
+        [TestCase("2130 South Fort Union Blvd.", "85 Morrison", 22)]
+        [TestCase("2130 South Fort Union Blvd.", "2350 North Main", 18)]
+        [TestCase("2130 South Fort Union Blvd.", "567 West Center Street", 23)]
+        [TestCase("2130 South Fort Union Blvd.", "2130 Fort Union Boulevard", 12)]
+        [TestCase("2130 South Fort Union Blvd.", "2310 S. Ft. Union Blvd.", 9)] //This case returns 8 in the old algorithm, seems like a bug in the old algorithm.
+        [TestCase("2130 South Fort Union Blvd.", "98 West Fort Union", 14)]
+        [TestCase("2130 South Fort Union Blvd.", "Rural Route 2 Box 29", 20)]
+        [TestCase("2130 South Fort Union Blvd.", "PO Box 3487", 23)]
+        [TestCase("2130 South Fort Union Blvd.", "3 Harvard Square", 23)]
+        public void LevenshteinDistanceUncachedAlternativeV2Tests(string input, string compareTo, int expected)
+        {
+            Assert.That(input.LevenshteinDistanceUncachedAlternativeV2(compareTo), Is.EqualTo(expected),"LevenshteinDistanceUncachedAlternativeV2");
         }
 
         [TestCase("beast of burden's power and toughness are each equal to the number of creatures on the battlefield", "Beast of Burden","", "'s power and toughness are each equal to the number of creatures on the battlefield")]

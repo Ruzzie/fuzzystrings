@@ -7,103 +7,14 @@ namespace Ruzzie.FuzzyStrings
     {
         public static int LevenshteinDistance(this string input, string comparedTo, bool caseSensitive = false)
         {
-            return LevenshteinDistanceUncached(input, comparedTo, caseSensitive);
+            return LevenshteinDistanceUncachedAlternativeV2(input, comparedTo, caseSensitive);
         }
 
-        /// <summary>
-        ///     Levenshtein Distance algorithm with transposition. <br />
-        ///     A value of 1 or 2 is okay, 3 is iffy and greater than 4 is a poor match
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="comparedTo"></param>
-        /// <param name="caseSensitive"></param>
-        /// <returns></returns>
-        /// <remarks>always case insensitive</remarks>
-        public static int LevenshteinDistanceUncached(this string input, string comparedTo, bool caseSensitive = false)
-        {
-            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
-            {
-                return -1;
-            }
-
-            if (!caseSensitive)
-            {
-                input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
-                comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);
-            }
-
-            int inputLen = input.Length + 1;
-            int comparedToLen = comparedTo.Length + 1;
-
-            int[,] matrix = new int[inputLen, comparedToLen];
-
-            //initialize           
-            for (var i = 0; i < inputLen; i++)
-            {
-                matrix[i, 0] = i;
-            }
-            for (var i = 0; i < comparedToLen; i++)
-            {
-                matrix[0, i] = i;
-            }
-
-            //analyze
-            for (var i = 1; i < inputLen; i++)
-            {
-                var si = input[i - 1];
-                for (var j = 1; j < comparedToLen; j++)
-                {
-                    var tj = comparedTo[j - 1];
-                    int cost = (si == tj) ? 0 : 1;
-
-                    int above = matrix[i - 1, j];
-                    int left = matrix[i, j - 1];
-                    int diag = matrix[i - 1, j - 1];
-                    int cell = FindMinimumOptimized(above + 1, left + 1, diag + cost);
-
-                    //transposition
-                    if (i > 1 && j > 1)
-                    {
-                        int trans = matrix[i - 2, j - 2] + 1;
-                        if (input[i - 2] != comparedTo[j - 1])
-                        {
-                            trans++;
-                        }
-                        if (input[i - 1] != comparedTo[j - 2])
-                        {
-                            trans++;
-                        }
-                        if (cell > trans)
-                        {
-                            cell = trans;
-                        }
-                    }
-
-                    matrix[i, j] = cell;
-                }
-            }
-            return matrix[inputLen - 1, comparedToLen - 1];
-        }
-
-        public static int FindMinimum(params int[] p)
-        {
-            if (ReferenceEquals(null,p))
-            {
-                return int.MinValue;
-            }
-            int min = int.MaxValue;
-            int length = p.Length;
-            for (var i = 0; i < length; ++i)
-            {
-                min = Math.Min(min, p[i]);
-            }
-            return min;
-        }
 
         #if HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         #endif
-        public static int FindMinimumOptimized(in int a, in int b, in int c)
+        public static int Min(int a, int b, int c)
         {
             return Math.Min(a, Math.Min(b, c));
         }
@@ -148,7 +59,7 @@ namespace Ruzzie.FuzzyStrings
                     char tj = comparedTo[j - 1];
                     var cost = (si == tj) ? bZero : bOne;
 
-                    int cell = FindMinimumOptimized(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1,
+                    int cell = Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1,
                         matrix[i - 1, j - 1] + cost);
 
                     //transposition
@@ -172,6 +83,49 @@ namespace Ruzzie.FuzzyStrings
                 }
             }
             return matrix[inputLen - 1, comparedToLen - 1];
+        }
+
+        public static int LevenshteinDistanceUncachedAlternativeV2(this string input,
+            string comparedTo,
+            bool caseSensitive = false)
+        {
+
+            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
+            {
+                return -1;
+            }
+
+            if (!caseSensitive)
+            {
+                input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
+                comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);
+            }
+
+            int x, y, lastdiag, olddiag;
+            var inputLength = input.Length;
+            var comparedToLength = comparedTo.Length;
+            unsafe
+            {
+                int* column = stackalloc int[inputLength + 1];//new int[inputLength + 1];
+                for (y = 1; y <= inputLength; y++)
+                {
+                    column[y] = y;
+                }
+
+                for (x = 1; x <= comparedToLength; x++)
+                {
+                    column[0] = x;
+                    for (y = 1, lastdiag = x - 1; y <= inputLength; y++)
+                    {
+                        olddiag = column[y];
+                        column[y] = Min(column[y] + 1, column[y - 1] + 1,
+                            lastdiag + (input[y - 1] == comparedTo[x - 1] ? 0 : 1));
+                        lastdiag = olddiag;
+                    }
+                }
+
+                return (column[inputLength]);
+            }
         }
     }
 }
