@@ -51,6 +51,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Assert.That(input.FuzzyMatchTokens(compareTo, false), Is.EqualTo(expected));
         }
 
+        [TestCase("Jensn","Jadams", 0.15384615384615385d )]
         [TestCase("Jensn","Adams", 0d )]
         [TestCase("Jensn", "Benson", 0.46153846153846156d)]
         [TestCase("Jensn", "Geralds", 0)]
@@ -76,7 +77,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         {
             Assert.That(input.DiceCoefficient(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
             Assert.That(input.DiceCoefficientAlternative(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
-            Assert.That(input.DiceCoefficientAlternativeV2(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
+            Assert.That( DiceCoefficientExtensions.DiceCoefficientAlternativeV2(input, compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
         }
 
         [TestCase("Jensn", "Adams", 5)]

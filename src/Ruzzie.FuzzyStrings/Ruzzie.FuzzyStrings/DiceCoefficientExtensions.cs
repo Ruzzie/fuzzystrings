@@ -1,36 +1,26 @@
-﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Derived from http://www.codeguru.com/vb/gen/vb_misc/algorithms/article.php/c13137__1/Fuzzy-Matching-Demo-in-Access.htm
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Ruzzie.Caching;
 
 namespace Ruzzie.FuzzyStrings
 {
     public static class DiceCoefficientExtensions
     {
-        private static readonly IFixedSizeCache<string, string[]> BiGramsCache = new FlashCache<string, string[]>(
+        private static readonly IFixedSizeCache<string, double> DiceCoefficientCaseInsensitiveCache = new FlashCache<string, double>(
             InternalVariables.DefaultCacheItemSizeInMb,
-            InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes, InternalVariables.AverageStringSizeInBytes + 2);
-
-        private static readonly IFixedSizeCache<string, HashSet<string>> BiGramsAltCache = new FlashCache<string, HashSet<string>>(InternalVariables.DefaultCacheItemSizeInMb ,
-          InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes, InternalVariables.AverageStringSizeInBytes + 2);
+            InternalVariables.StringComparerForCacheKey,
+            InternalVariables.AverageStringSizeInBytes);
 
         private const string SinglePercent = "%";
         private const string SinglePound = "#";
         private const string DoublePercent = "&&";
         private const string DoublePound = "##";
 
+
         public static double DiceCoefficient(this string input, string comparedTo)
         {
-            var compareToNgrams = BiGramsAltCache.GetOrAdd(comparedTo, key => comparedTo.ToUniqueBiGrams());
-            var ngrams = BiGramsCache.GetOrAdd(input, key => input.ToBiGrams());
-            
-
-            //var ngrams = input.ToBiGrams();
-            //var compareToNgrams = comparedTo.ToUniqueBiGrams();
-            return ngrams.DiceCoefficientAlternative(compareToNgrams, comparedTo.Length);
+            return DiceCoefficientCaseInsensitiveCache.GetOrAdd(string.Concat(input, comparedTo),
+                key => input.DiceCoefficientAlternativeV2(comparedTo));
         }
 
         public static double DiceCoefficientAlternative(this string input, string comparedTo)
@@ -43,50 +33,55 @@ namespace Ruzzie.FuzzyStrings
 
         public static double DiceCoefficientAlternativeV2(this string input, string comparedTo)
         {
-            
-            //To Bigrams
-            input = string.Concat(SinglePercent, input, SinglePound);
-            int inputNgramsLength = input.Length - 1;
-
-            
-            comparedTo = string.Concat(SinglePercent, comparedTo, SinglePound);
-            int comparedToNgramsLength = comparedTo.Length - 1;
-
             unsafe
             {
-                BiGram* inputNgrams = stackalloc BiGram[inputNgramsLength];
-               // var lastComparedToIndexCreated = 0;
+                //var input = inputOriginal;//SinglePercent + inputOriginal + SinglePound;//string.Concat(SinglePercent, input, SinglePound);
+                int inputNgramsLength = input.Length -1;
 
-                fixed (char* inputPtr = input)
+               // var comparedTo = comparedToOriginal; //SinglePercent + comparedToOriginal + SinglePound;//string.Concat(SinglePercent, comparedTo, SinglePound);
+                int comparedToNgramsLength = comparedTo.Length - 1;
+
+                if (inputNgramsLength < 1 || comparedToNgramsLength < 1)
                 {
+                    return 0;
+                }
+
+                var lastComparedToIndexCreated = -1;
+                int* comparedToNgrams = stackalloc int[comparedToNgramsLength];
+                var matches = 0;
+                fixed (char* inputPtr = input, comparedToPtr = comparedTo)
+                {
+                    //Check if the the first and / or last chars are the same if so increment match
+                    // we do this so no string concatenation with the SinglePercent + input + SinglePound is needed on the input string
+                    if (*inputPtr == *comparedToPtr)
+                    {
+                        matches++;
+                    }
+
+                    if (inputPtr[inputNgramsLength] == comparedToPtr[comparedToNgramsLength])
+                    {
+                        matches++;
+                    }
+
                     for (int i = 0; i < inputNgramsLength; i++)
                     {
-                        inputNgrams[i] = new BiGram(inputPtr, i);
+                        var inputBiGramValue = GetBiGramValueAsInt(inputPtr, i);
 
-                    }
-                }
-
-
-                BiGram* comparedToNgrams = stackalloc BiGram[comparedToNgramsLength];
-
-                fixed (char* comparedToPtr = comparedTo)
-                {
-                    for (int i = 0; i < comparedToNgramsLength; i++)
-                    {
-                        comparedToNgrams[i] = new BiGram(comparedToPtr, i); 
-                    }
-                }
-
-                var matches = 0;
-                //Now see if there are matches
-                for (int i = 0; i < inputNgramsLength; i++)
-                {
-                    for (int j = 0; j < comparedToNgramsLength; j++)
-                    {
-                        if (inputNgrams[i].Value == comparedToNgrams[j].Value)
+                        for (int j = 0; j < comparedToNgramsLength; j++)
                         {
-                            matches++;
-                            break;
+                            //Only create new BiGram of comparedTo when not already created
+                            if (lastComparedToIndexCreated < j)
+                            {
+                                comparedToNgrams[j] = GetBiGramValueAsInt(comparedToPtr, j);
+                                lastComparedToIndexCreated = j;
+                            }
+
+                            //Now see if there are matches
+                            if (inputBiGramValue == comparedToNgrams[j])
+                            {
+                                matches++;
+                                break;
+                            }
                         }
                     }
                 }
@@ -95,44 +90,19 @@ namespace Ruzzie.FuzzyStrings
                 {
                     return 0.0d;
                 }
-                double totalBigrams = inputNgramsLength + comparedToNgramsLength;
+                double totalBigrams = inputNgramsLength + comparedToNgramsLength + 4;//+4 since we do not concat the string anymore, which results in +2 bigrams per input
                 return (2 * matches) / totalBigrams;
             }
         }
 
-        private readonly struct BiGram : IEquatable<BiGram>
+        #if HAVE_METHODINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        #endif
+        private static unsafe int GetBiGramValueAsInt(char* value, int startIndex)
         {
-            public readonly int Value;
-            public unsafe BiGram(char* value, int startIndex)
-            {
-                Value = value[startIndex] << 16;
-                Value |= value[startIndex + 1];
-            }
-
-            public bool Equals(BiGram other)
-            {
-                return Value == other.Value;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return obj is BiGram other && Equals(other);
-            }
-
-            public override int GetHashCode()
-            {
-                return Value;
-            }
-
-            public static bool operator ==(BiGram left, BiGram right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(BiGram left, BiGram right)
-            {
-                return !left.Equals(right);
-            }
+            //int r = value[startIndex] << 16;
+            //return r |= value[startIndex + 1];
+            return *(int*) &value[startIndex];
         }
 
         private static double DiceCoefficientAlternative(this string[] nGrams, HashSet<string> compareToNGrams, int compareToLength)

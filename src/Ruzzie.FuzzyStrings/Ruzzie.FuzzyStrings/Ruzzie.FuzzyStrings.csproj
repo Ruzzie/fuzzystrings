@@ -78,25 +78,29 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' Or '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">
-    <DefineConstants>$(DefineConstants)HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_VISUALBASIC_DEVICES;HAVE_FULL_REFLECTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_VISUALBASIC_DEVICES;HAVE_FULL_REFLECTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO</DefineConstants>
     <CodeAnalysisRuleSet>RuleSet.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">
+    <DefineConstants>$(DefineConstants);HAVE_BUFFER_MEMORYCOPY</DefineConstants>
+  </PropertyGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_FULL_REFLECTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_FULL_REFLECTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
-    <DefineConstants>$(DefineConstants);HAVE_REGEXCOMPILEDOPTION;HAVE_METHODINLINING;HAVE_FILEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAVE_REGEXCOMPILEDOPTION;HAVE_METHODINLINING;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);HAVE_REGEXCOMPILEDOPTION;HAVE_METHODINLINING;HAVE_FILEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAVE_REGEXCOMPILEDOPTION;HAVE_METHODINLINING;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.2' ">
@@ -107,10 +111,8 @@
     <DefineConstants>$(DefineConstants);HAVE_METHODINLINING</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net40|AnyCPU'">
-    <DebugType>full</DebugType>
+  <PropertyGroup>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>obj\Release\net472\Ruzzie.FuzzyStrings.xml</DocumentationFile>
   </PropertyGroup>
 
   <!--<PropertyGroup Condition=" '$(TargetFramework)' == 'portable40-net45+sl5+win8+wp8+wpa81' ">

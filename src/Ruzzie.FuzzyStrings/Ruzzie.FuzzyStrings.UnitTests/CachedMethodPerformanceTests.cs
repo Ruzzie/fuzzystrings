@@ -300,13 +300,13 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             Func<double> original = () => (sourceString + random.Next()).DiceCoefficientAlternative(stringToFind + random.Next());
 
-            Func<double> alternative = () => (sourceString + random.Next()).DiceCoefficientAlternativeV2(stringToFind + random.Next());
+            Func<double> alternative = () => (sourceString + random.Next()) .DiceCoefficientAlternativeV2(stringToFind + random.Next());
 
-            var numberOfTimesToExecute = 100000;
+            var numberOfTimesToExecute = 10000;
 
             //warmup
-            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
-            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, original);
+            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute /2, alternative);
+            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute /2, original);
 
             //execute
             alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
