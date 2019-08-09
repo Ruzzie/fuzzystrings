@@ -230,6 +230,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             LongestCommonSubsequenceResult result = input.LongestCommonSubsequenceUncached(compareTo, false, false);
             Assert.That(result.Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
             Assert.That(input.LongestCommonSubsequence(compareTo,false,true).Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
+            Assert.That(input.LongestCommonSubsequenceWithoutSubsequenceAlternative(compareTo,false).Coefficient, Is.EqualTo(expectedDouble).Within(0.000009));
         }
 
         [TestCase("Jensn", "Adams", false)]

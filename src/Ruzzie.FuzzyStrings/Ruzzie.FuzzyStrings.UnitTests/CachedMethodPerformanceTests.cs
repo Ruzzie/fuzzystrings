@@ -107,11 +107,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string stringToFind = "to the number of creatures" + next;
 
             //classic replace method with tolowercase
-            Func<LongestCommonSubsequenceResult> original =() => (sourceString + next).LongestCommonSubsequenceUncached(stringToFind + next,false,true);
+            Func<LongestCommonSubsequenceResult> original =() => (sourceString + next).LongestCommonSubsequenceUncached(stringToFind + next,true,false);
 
-            Func<LongestCommonSubsequenceResult> alternative =  () => (sourceString + next).LongestCommonSubsequenceUncached(stringToFind + next, false, false);
+            Func<LongestCommonSubsequenceResult> alternative =  () => (sourceString + next).LongestCommonSubsequenceWithoutSubsequenceAlternative(stringToFind + next, true);
 
-            var numberOfTimesToExecute = 500;
+            var numberOfTimesToExecute = 5000;
 
             //warmup
             TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(250, alternative);

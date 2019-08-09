@@ -106,7 +106,7 @@ namespace Ruzzie.FuzzyStrings
             var comparedToLength = comparedTo.Length;
             unsafe
             {
-                int* column = stackalloc int[inputLength + 1];//new int[inputLength + 1];
+                int* column = stackalloc int[inputLength + 1];
                 for (y = 1; y <= inputLength; y++)
                 {
                     column[y] = y;
@@ -118,7 +118,9 @@ namespace Ruzzie.FuzzyStrings
                     for (y = 1, lastdiag = x - 1; y <= inputLength; y++)
                     {
                         olddiag = column[y];
-                        column[y] = Min(column[y] + 1, column[y - 1] + 1,
+                        column[y] = Min(
+                            column[y] + 1,
+                            column[y - 1] + 1,
                             lastdiag + (input[y - 1] == comparedTo[x - 1] ? 0 : 1));
                         lastdiag = olddiag;
                     }
