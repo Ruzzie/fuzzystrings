@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using Ruzzie.Caching;
 using System.Runtime.CompilerServices;
 
 namespace Ruzzie.FuzzyStrings
@@ -15,14 +14,11 @@ namespace Ruzzie.FuzzyStrings
     /// </remarks>
     public static class DoubleMetaphoneExtensions
     {
-        private static readonly IFixedSizeCache<string, string> Cache = new FlashCache<string, string>(InternalVariables.DefaultCacheItemSizeInMb,
-            InternalVariables.StringComparerForCacheKey, InternalVariables.AverageStringSizeInBytes);
-
-        private static readonly string[] MegaphonesToSkipAtStartOfWord = new[] {strGN, strKN, strPN, strWR, strPS};
+        //private static readonly string[] MegaphonesToSkipAtStartOfWord = new[] {strGN, strKN, strPN, strWR, strPS};
 
         public static string ToDoubleMetaphone(this string input)
         {
-            return Cache.GetOrAdd(input, ToDoubleMetaphoneUncached);
+            return input.ToDoubleMetaphoneUncached();
         }
 
         public static unsafe bool IsSlavoGermanic(in string input)
