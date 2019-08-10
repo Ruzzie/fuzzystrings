@@ -16,9 +16,9 @@ namespace Ruzzie.FuzzyStrings
     {
         //private static readonly string[] MegaphonesToSkipAtStartOfWord = new[] {strGN, strKN, strPN, strWR, strPS};
 
-        public static string ToDoubleMetaphone(this string input)
+        public static string ToDoubleMetaphone(this string input, bool isAlreadyToUpper = false)
         {
-            return input.ToDoubleMetaphoneUncached();
+            return input.ToDoubleMetaphoneUncached(isAlreadyToUpper);
         }
 
         public static unsafe bool IsSlavoGermanic(in string input)
@@ -48,18 +48,27 @@ namespace Ruzzie.FuzzyStrings
             }
             
         }
-        public static string ToDoubleMetaphoneUncached(this string input)
+        public static string ToDoubleMetaphoneUncached(this string input, bool isAlreadyToUpper = false)
         {
-            if (input.Length < 1)
+            var inputLength = input.Length;
+
+            if (inputLength < 1)
             {
                 return input;
             }
 
-            MetaphoneData metaphoneData = new MetaphoneData();
             int current = 0;
 
-            string workingString = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input) + " ";// + "     ";
-
+            string workingString;
+            if (isAlreadyToUpper)
+            {
+                workingString = input + " ";
+            }
+            else
+            {
+                workingString = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input) + " ";// + "     ";
+            }
+            
             bool isSlavoGermanic = IsSlavoGermanic(workingString);
 
             //skip these when at start of word: MegaphonesToSkipAtStartOfWord
@@ -68,27 +77,132 @@ namespace Ruzzie.FuzzyStrings
                 current += 1;
             }
 
-            //Initial 'X' is pronounced 'Z' e.g. 'Xavier'
-            if (workingString[0] == charX)
+            unsafe
             {
-                metaphoneData.Add(charS); //'Z' maps to 'S'
-                current += 1;
-            }
+                //Dirty, dirty, but lets see if we can reduce allocation time and GC time as well as unnecessary resizing of StringBuilder.
+                var bufferSize = 16;
+                char* primary = stackalloc char[bufferSize];
+                char* secondary = stackalloc char[bufferSize];
 
-            while ((metaphoneData.PrimaryLength < 4) || (metaphoneData.SecondaryLength < 4))
-            {
-                if (current >= input.Length)
+                MetaphoneBuffer metaphoneData = new MetaphoneBuffer(bufferSize, primary, secondary);
+
+                //Initial 'X' is pronounced 'Z' e.g. 'Xavier'
+                if (workingString[0] == charX)
                 {
-                    break;
+                    metaphoneData.Add(charS); //'Z' maps to 'S'
+                    current += 1;
                 }
 
-                current = MapCharacter(workingString, current, metaphoneData, isSlavoGermanic, input.Length - 1);//zero based index
-            }
+                while ((metaphoneData.PrimaryIndex < 4) || (metaphoneData.SecondaryIndex < 4))
+                {
+                    if (current >= inputLength)
+                    {
+                        break;
+                    }
 
-            return metaphoneData.ToString();
+                    current = MapCharacter(workingString, current, ref metaphoneData, isSlavoGermanic, inputLength - 1);//zero based index
+                }
+
+                return metaphoneData.ToString();
+            }
+         
         }
 
-        private static int MapCharacter(in string workingString, int current, MetaphoneData metaphoneData, bool isSlavoGermanic, int last)
+        //Don't use this struct, it is only used in this specialized edge case for perf. (Yes perf, was tested and profiled).
+        unsafe struct MetaphoneBuffer
+        {
+            public readonly char* Primary;
+            public int PrimaryIndex;
+
+            public readonly char* Secondary;
+            public int SecondaryIndex;
+
+            public readonly int MaxSize;
+            private bool _alternative;
+
+            public MetaphoneBuffer(int maxSize, char* primary, char* secondary)
+            {
+                MaxSize = maxSize;
+                Primary = primary;
+                Secondary = secondary;
+                PrimaryIndex = 0;
+                SecondaryIndex = 0;
+                _alternative = false;
+            }
+
+            internal void Add(string main)
+            {
+                if (main != null)
+                {
+                    var mainLength = main.Length;
+                    for (int i = 0;
+                        i < mainLength && PrimaryIndex < MaxSize && SecondaryIndex < MaxSize;
+                        i++)
+                    {
+                        //Maybe to optimize we could do a memcopy directly
+                        var charToAdd = main[i];
+                        Primary[PrimaryIndex] = charToAdd;
+                        Secondary[SecondaryIndex] = charToAdd;
+                        PrimaryIndex++;
+                        SecondaryIndex++;
+                    }
+                }
+            }
+
+            internal void Add(char main)
+            {
+                //skip the check, to check if it fails
+                Primary[PrimaryIndex++] = main;
+                Secondary[SecondaryIndex++] = main;
+            }
+
+            internal void Add(string main, string alternative)
+            {
+                if (main != null)
+                {
+                    var mainLength = main.Length;
+                    for (int i = 0;
+                        i < mainLength && PrimaryIndex < MaxSize;
+                        i++)
+                    {
+                        //Maybe to optimize we could do a memcopy directly
+                        var charToAdd = main[i];
+                        Primary[PrimaryIndex] = charToAdd;
+                        PrimaryIndex++;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(alternative))
+                {
+                    _alternative = true;
+                    if (alternative.Trim().Length > 0)
+                    {
+                        var altLength = alternative.Length;
+                        for (int i = 0;
+                            i < altLength && SecondaryIndex < MaxSize;
+                            i++)
+                        {
+                            //Maybe to optimize we could do a memcopy directly
+                            var charToAdd = alternative[i];
+                            Secondary[SecondaryIndex] = charToAdd;
+                            SecondaryIndex++;
+                        }
+                    }
+                }
+            }
+
+            public override string ToString()
+            {
+                //only give back 4 char metaph
+                if (_alternative)
+                {
+                    return new string(Secondary, 0, Math.Min(4, SecondaryIndex));
+                }
+
+                return new string(Primary, 0, Math.Min(4, PrimaryIndex));
+            }
+        }
+        private static int MapCharacter(in string workingString, int current, ref MetaphoneBuffer metaphoneData, bool isSlavoGermanic, int last)
         {
             switch (workingString[current])
             {
@@ -126,7 +240,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charC:
-                    current = MapCharacterC(workingString, current, metaphoneData);
+                    current = MapCharacterC(workingString, current, ref metaphoneData);
                     break;
 
                 case charD:
@@ -173,7 +287,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charG:
-                    current = MapCharacterG(workingString, current, metaphoneData, isSlavoGermanic);
+                    current = MapCharacterG(workingString, current, ref metaphoneData, isSlavoGermanic);
                     break;
                 case 'H':
                     //only keep if first & before vowel or btw. 2 vowels
@@ -360,7 +474,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charS:
-                    current = MapCharacterS(workingString, current, metaphoneData, isSlavoGermanic, last);
+                    current = MapCharacterS(workingString, current, ref metaphoneData, isSlavoGermanic, last);
                     break;
 
                 case charT:
@@ -517,7 +631,7 @@ namespace Ruzzie.FuzzyStrings
             return current;
         }
 
-        private static int MapCharacterS(string workingString, int current, MetaphoneData metaphoneData, bool isSlavoGermanic, int last)
+        private static int MapCharacterS(string workingString, int current, ref MetaphoneBuffer metaphoneData, bool isSlavoGermanic, int last)
         {
 //special cases 'island', 'isle', 'carlisle', 'carlysle'
             if (StringAt(workingString, (current - 1), strISL, strYSL))
@@ -650,7 +764,7 @@ namespace Ruzzie.FuzzyStrings
             return current;
         }
 
-        private static int MapCharacterG(string workingString, int current, MetaphoneData metaphoneData, bool isSlavoGermanic)
+        private static int MapCharacterG(string workingString, int current, ref MetaphoneBuffer metaphoneData, bool isSlavoGermanic)
         {
             if (workingString[current + 1] == charH)
             {
@@ -793,7 +907,7 @@ namespace Ruzzie.FuzzyStrings
            
         }
 
-        private static int MapCharacterC(string workingString, int current, MetaphoneData metaphoneData)
+        private static int MapCharacterC(string workingString, int current, ref MetaphoneBuffer metaphoneData)
         {
 //various germanic
             if ((current > 1)
@@ -1273,9 +1387,8 @@ namespace Ruzzie.FuzzyStrings
 
         private class MetaphoneData
         {
-            readonly StringBuilder _primary = new StringBuilder(5);
-            readonly StringBuilder _secondary = new StringBuilder(5);
-
+            private readonly StringBuilder _primary = new StringBuilder(5, 16);
+            private readonly StringBuilder _secondary = new StringBuilder(5, 16);
             #region Properties
 
             private bool Alternative { get; set; }
@@ -1320,7 +1433,7 @@ namespace Ruzzie.FuzzyStrings
                     _primary.Append(main);
                 }
 
-                if (alternative != null)
+                if (alternative.Length >= 0)
                 {
                     Alternative = true;
                     if (alternative.Trim().Length > 0)
@@ -1328,18 +1441,19 @@ namespace Ruzzie.FuzzyStrings
                         _secondary.Append(alternative);
                     }
                 }
-                else
-                {
-                    if (main != null && main.Trim().Length > 0)
-                    {
-                        _secondary.Append(main);
-                    }
-                }
+                //else
+                //{
+                //    if (main != null && main.Trim().Length > 0)
+                //    {
+                //        _secondary.Append(main);
+                //    }
+                //}
             }
 
             public override string ToString()
             {
                 string ret = (Alternative ? _secondary : _primary).ToString();
+                
                 //only give back 4 char metaph
                 if (ret.Length > 4)
                 {

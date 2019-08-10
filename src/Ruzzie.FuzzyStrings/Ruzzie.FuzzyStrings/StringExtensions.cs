@@ -101,6 +101,7 @@ namespace Ruzzie.FuzzyStrings
         {
             string localA = StripAlternativeV2(strA.Trim());
             string localB = StripAlternativeV2(strB.Trim());
+            bool isAlreadyToUpper = false;
             if (!caseSensitive)
             {                
                 if (string.Equals(localA, localB, StringComparison.OrdinalIgnoreCase))
@@ -110,6 +111,8 @@ namespace Ruzzie.FuzzyStrings
 
                 localA = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(localA);
                 localB = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(localB);
+                isAlreadyToUpper = true;
+
             }
             else
             {              
@@ -134,7 +137,7 @@ namespace Ruzzie.FuzzyStrings
                    
                     for (int x = 0; x < partsBLength; x++)
                     {
-                        var coefficient = CompositeCoefficient(partsA[i], partsB[x]);
+                        var coefficient = CompositeCoefficient(partsA[i], partsB[x], caseSensitive, isAlreadyToUpper);
                         if (coefficient > high)
                         {
                             high = coefficient;
@@ -148,7 +151,7 @@ namespace Ruzzie.FuzzyStrings
                 double avgWeightedHighCoefficient = weightedHighCoefficientsSum / partsALength;
                 return avgWeightedHighCoefficient < 0.999999 ? avgWeightedHighCoefficient : FuzzyMatchMaxProbability; //fudge factor
             }
-            var singleComposite = CompositeCoefficient(localA, localB);
+            var singleComposite = CompositeCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
             return singleComposite < 0.999999 ? singleComposite : FuzzyMatchMaxProbability; //fudge factor
         }
 
@@ -247,14 +250,17 @@ namespace Ruzzie.FuzzyStrings
              return input.IndexOf(stringToFind,0, comparison) != -1;
         }
 
-        private static double CompositeCoefficient(string strA, string strB, bool caseSensitive = true)
+        private static double CompositeCoefficient(string strA,
+            string strB,
+            bool caseSensitive = true,
+            bool isAlreadyToUpper = false)
         {
             double dice = strA.DiceCoefficient(strB);
             var lcs = strA.LongestCommonSubsequence(strB, caseSensitive, false);
             double levenCoefficient = CalculateLevenshteinDistanceCoefficientForCompositeCoefficient(strA, strB, caseSensitive);//may want to tweak offset
 
-            string strAMp = strA.ToDoubleMetaphone();
-            string strBMp = strB.ToDoubleMetaphone();
+            string strAMp = strA.ToDoubleMetaphone(isAlreadyToUpper);
+            string strBMp = strB.ToDoubleMetaphone(isAlreadyToUpper);
             int matchCount = 0;
             int strAMpLength = strAMp.Length;
             if (strAMpLength == 4 && strBMp.Length == 4)
