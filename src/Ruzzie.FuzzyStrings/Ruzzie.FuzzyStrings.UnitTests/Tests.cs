@@ -180,6 +180,14 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("PO Box 3487", "PPKS")]
         [TestCase("3 Harvard Square", "RFRT")]
         [TestCase("Grizzled Angler", "KRSL")]
+        [TestCase("Gallegos", "KKS")]
+        [TestCase("cabrillo", "KPR")]
+        [TestCase("Witzsche", "FFXX")]
+        [TestCase("Wiklamab", "FKLM")]
+        [TestCase("wiklamab", "FKLM")]
+        [TestCase("Acze", "AX")]
+        [TestCase("Gnollero", "NLR")]
+        [TestCase("Psollero", "SLR")]
         public void ToDoubleMetaPhoneTests(string input, string expected)
         {
             Assert.That(input.ToDoubleMetaphone(), Is.EqualTo(expected));

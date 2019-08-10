@@ -12,7 +12,6 @@
     <AssemblyName>Ruzzie.FuzzyStrings</AssemblyName>
     <PackageId>Ruzzie.FuzzyStrings</PackageId>
     <PackageProjectUrl>https://github.com/Ruzzie/fuzzystrings</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/Ruzzie/fuzzystrings/blob/master/src/Ruzzie.FuzzyStrings/License.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/Ruzzie/fuzzystrings</RepositoryUrl>
     <License>Apache-2.0</License>
