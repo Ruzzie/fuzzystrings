@@ -3,22 +3,6 @@
 namespace Ruzzie.FuzzyStrings.UnitTests
 {
     [TestFixture]
-    public class WhitespaceTokenizerTests
-    {
-        [TestCase("a\nb\tc d",4)]
-        [TestCase("a\nb\tc",3)]
-        [TestCase("a c",2)]
-        [TestCase("ac",1)]
-        [TestCase("",0)]
-        public void TokenizeTest(string input, int expectedTokenCount)
-        {
-            IStringTokenizer stringTokenizer = new WhitespaceTokenizer();
-
-            Assert.That(stringTokenizer.Tokenize(input).Length, Is.EqualTo(expectedTokenCount));
-        }
-    }
-
-    [TestFixture]
     public class Tests
     {
         [Test]
@@ -43,7 +27,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("guard elite kjeldoran", "kjeldoran elite guard", 0.70495849510110475d)]
         [TestCase("guard kjeldoran elite", "kjeldoran elite guard", 0.70495849510110475d)]
         [TestCase("kjeldoran elite guard master", "kjeldoran elite guard",  0.55814012072314667d)]
-        [TestCase("Grizzled Angler", "Tangle Angler", 0.65633302805706839d)]
+        [TestCase("Grizzled Angler", "Tangle Angler", 0.73445802805706839d)]
         [TestCase("", "",StringExtensions.ExactMatchProbability)]
         [TestCase("\t\n", "   ", StringExtensions.ExactMatchProbability)]        
         public void TokenizeFuzzyMatch(string input, string compareTo, double expected)
@@ -148,6 +132,33 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Assert.That(input.AnyString(stringToFind), Is.EqualTo(expectedResult));
         }
 
+        [TestCase("{B}{G}", "B", 1, true)]
+        [TestCase("{G}", "G", 1, true)]
+        [TestCase("{G}", "B", 1, false)]
+        [TestCase("", "B", 0, false)]
+        [TestCase("", "", 0, true)]
+        //[TestCase("A string original", "original", 0, false)] // this differs with the original implementation (which i consider a bug)
+        [TestCase("very much", "very much longer and longer", 0, false)]
+        [TestCase("very much longer", "very much longer and longer", 5, false)]
+        public void StringAtOneParamTests(string input, string stringAt, int atIndex, bool expectedResult)
+        {
+            Assert.That(DoubleMetaphoneExtensions.StringAt(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAt");
+            Assert.That(DoubleMetaphoneExtensions.StringAtOrig(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAtOrig");
+        }
+
+        [TestCase("{B}{G}", "B", 1, true)]
+        [TestCase("{G}", "G", 1, true)]
+        [TestCase("{G}", "B", 1, false)]
+        [TestCase("", "B", 0, false)]
+        [TestCase("", "", 0, true)]
+        [TestCase("A string original", "original", 0, true)]
+        [TestCase("very much", "very much longer and longer", 0, false)]
+        [TestCase("very much longer", "very much longer and longer", 5, false)]
+        public void StringAtOneOrigParamTests(string input, string stringAt, int atIndex, bool expectedResult)
+        {
+            Assert.That(DoubleMetaphoneExtensions.StringAtOrig(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAtOrig");
+        }
+
         [TestCase("Jensn", "ANSN")]
         [TestCase("Adams", "ATMS")]
         [TestCase("Geralds", "JRLT")]
@@ -156,21 +167,35 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("Jensen", "ANSN")]
         [TestCase("Jordon", "ARTN")]
         [TestCase("Madsen", "MTSN")]
-        [TestCase("Stratford", "STTR")]
+        [TestCase("Stratford", "STRT")]
         [TestCase("Wilkins", "FLKN")]
         [TestCase("2689 East Milkin Ave.", "STML")]
         [TestCase("85 Morrison", "MRSN")]
         [TestCase("2350 North Main", "NRTM")]
-        [TestCase("567 West Center Street", "SSNT")]
+        [TestCase("567 West Center Street", "STSN")]
         [TestCase("2130 Fort Union Boulevard", "FRTN")]
         [TestCase("2310 S. Ft. Union Blvd.", "SFTN")]
         [TestCase("98 West Fort Union", "STFR")]
         [TestCase("Rural Route 2 Box 29", "RRLR")]
         [TestCase("PO Box 3487", "PPKS")]
         [TestCase("3 Harvard Square", "RFRT")]
+        [TestCase("Grizzled Angler", "KRSL")]
         public void ToDoubleMetaPhoneTests(string input, string expected)
         {
             Assert.That(input.ToDoubleMetaphone(), Is.EqualTo(expected));
+        }
+
+        [TestCase("Spotify","Spotfy","Sputfi", "Spotifi")]
+        [TestCase( "United Air Lines", "United Aire Lines", "Unitid Air Line")]
+        public void ToDoubleMetaPhoneSimilarTests(params string[] resultsInSame)
+        {
+            var previous = resultsInSame[0].ToDoubleMetaphoneUncached();
+            for (int i = 1; i < resultsInSame.Length; i++)
+            {
+                var current = resultsInSame[i].ToDoubleMetaphoneUncached();
+                Assert.That(current, Is.EqualTo(previous));
+                previous = current;
+            }
         }
 
         [TestCase("Jensn", "Adams", 0.04000d,"s")]

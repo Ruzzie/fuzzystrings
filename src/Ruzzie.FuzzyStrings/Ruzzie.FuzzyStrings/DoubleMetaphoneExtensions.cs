@@ -1,35 +1,7 @@
-﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Derived from http://doublemetaphone.googlecode.com/svn/tags/1/DoubleMetaphone.cs 
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-/* Origianal Work Copyright Notice included here as required: 
-
-        Copyright (c) 2008 Anthony Tong Lee
-
-        Permission is hereby granted, free of charge, to any person
-        obtaining a copy of this software and associated documentation
-        files (the "Software"), to deal in the Software without
-        restriction, including without limitation the rights to use,
-        copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the
-        Software is furnished to do so, subject to the following
-        conditions:
-
-        The above copyright notice and this permission notice shall be
-        included in all copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-        OTHER DEALINGS IN THE SOFTWARE.
-*/
-
-using System;
+﻿using System;
 using System.Text;
 using Ruzzie.Caching;
+using System.Runtime.CompilerServices;
 
 namespace Ruzzie.FuzzyStrings
 {
@@ -1163,9 +1135,10 @@ namespace Ruzzie.FuzzyStrings
         private const string strET = "ET";
         // ReSharper restore InconsistentNaming
 
-        static bool StartsWith(this string self, StringComparison comparison, params string[] strings)
+        static bool StartsWith(this string self, StringComparison comparison, string[] strings)
         {
-            for (int i = 0; i < strings.Length; i++)
+            var stringsLength = strings.Length;
+            for (int i = 0; i < stringsLength; i++)
             {                
                 if (self.StartsWith(strings[i], comparison))
                 {
@@ -1175,36 +1148,108 @@ namespace Ruzzie.FuzzyStrings
             return false;
         }
 
-        static bool StringAt(this string self, int startIndex, params string[] strings)
+        static bool StringAt(this string self, int startIndex, string a, string b)
         {
-            if (startIndex < 0)
-            {
-                startIndex = 0;
-            }
-
-            for (int i = 0; i < strings.Length; i++)
-            {
-                if( self.Substring(startIndex).ContainsString(strings[i]))
-                {
-                    return true;
-                }                              
-            }
-            return false;
+            return StringAt(self, startIndex, a) || StringAt(self, startIndex, b);
         }
 
-        static bool StringAt(this string self, int startIndex, string value)
+        static bool StringAt(this string self, int startIndex, string a, string b, string c)
+        {
+            return StringAt(self, startIndex, a) || StringAt(self, startIndex, b)  || StringAt(self, startIndex, c);
+        }
+
+        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d)
+        {
+            return StringAt(self, startIndex, a, b) || StringAt(self, startIndex, c, d);
+        }
+
+        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e)
+        {
+            return StringAt(self, startIndex, a, b, c) || StringAt(self, startIndex, d, e);
+        }
+
+        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f)
+        {
+            return StringAt(self, startIndex, a, b, c) || StringAt(self, startIndex, d, e, f);
+        }
+
+        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h)
+        {
+            return StringAt(self, startIndex, a, b, c, d) || StringAt(self, startIndex, e, f, g, h);
+        }
+
+        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h, string i, string j)
+        {
+            return StringAt(self, startIndex, a, b, c, d) || StringAt(self, startIndex, e, f, g, h) || StringAt(self, startIndex, i, j);
+        }
+
+        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h, string i, string j, string k)
+        {
+            return StringAt(self, startIndex, a, b, c, d) || StringAt(self, startIndex, e, f, g, h) || StringAt(self, startIndex, i, j, k);
+        }
+
+        public static bool StringAtOrig(this string self, int startIndex, string value)
         {
             if (startIndex < 0)
             {
                 startIndex = 0;
             }
 
-            if (startIndex > 0)
+            if (self.IndexOf(value, startIndex, StringComparison.OrdinalIgnoreCase) >= startIndex)
             {
-                return self.Substring(startIndex).ContainsString(value);
+                return true;
             }
 
-            return self.ContainsString(value);
+            return false;// self.ContainsString(value);
+        }
+
+#if !PORTABLE && HAVE_METHODINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static unsafe bool StringAt(char* selfPtr, int selfLength, int startIndex, char* valuePtr, int valueLength)
+        {
+            if (selfLength - startIndex - valueLength < 0)
+            {
+                return false;
+            }
+
+            char* startSelf = selfPtr + startIndex;
+            char* startValue = valuePtr;
+            int pos = 0;
+                    
+            while (pos < valueLength)
+            {
+                        
+                if (*startSelf != *startValue)
+                {
+                    return false;
+                }
+
+                startSelf++;
+                startValue++;
+                pos++;
+            }
+
+            return true;
+        }
+
+        public static bool StringAt(this string self, int startIndex, string value)
+        {
+            if (startIndex < 0)
+            {
+                startIndex = 0;
+            }
+
+            unsafe
+            {
+                fixed (char* selfPtr = self, valuePtr = value)
+                {
+                    var selfLength = self.Length;
+                    var valueLength = value.Length;
+
+                    return StringAt(selfPtr, selfLength, startIndex, valuePtr, valueLength);
+                }
+            }
         }
 
         private class MetaphoneData
