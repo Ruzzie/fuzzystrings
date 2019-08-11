@@ -333,6 +333,40 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Assert.That(input.FuzzyMatch(compareTo, false), Is.EqualTo(expected).Within(0.1159));
         }
 
+
+        [TestCase("FLYING (THIS CREATURE CAN'T BE BLOCKED", "FLYING (THIS CREATURE CAN'T BE BLOCKED", 0.99999899999999997d)]//equal strings
+        [TestCase("JENSN", "ADAMS", 0.13202380952381d)]
+        [TestCase("JENSN", "BENSON", 0.499854312354312d)]
+        [TestCase("JENSN", "GERALDS", 0.0623626373626374)]
+        [TestCase("JENSN", "JOHANNSON", 0.226549145299145)]
+        [TestCase("JENSN", "JOHNSON", 0.478125)]
+        [TestCase("JENSN", "JENSEN", 0.792307692307692)]
+        [TestCase("JENSN", "JORDON", 0.278113553113553)]
+        [TestCase("JENSN", "MADSEN", 0.29478021978022)]
+        [TestCase("JENSN", "STRATFORD", 0.0360433604336043)]
+        [TestCase("JENSN", "WILKINS", 0.167108294930876)]
+
+        [TestCase("FLYING (THIS CREATURE CAN'T BE BLOCKED EXCEPT BY CREATURES WITH FLYING OR REACH.) VIGILANCE (ATTACKING DOESN'T CAUSE THIS CREATURE TO TAP.)",
+            "FIREBOLT DEALS 2 DAMAGE TO TARGET CREATURE OR PLAYER. FLASHBACK {4}{R} (YOU MAY CAST THIS CARD FROM YOUR GRAVEYARD FOR ITS FLASHBACK COST. THEN EXILE IT.)",
+             0.45195413898026665)]
+        [TestCase("SACRIFICE A GOBLIN CREATURE: AIRDROP CONDOR DEALS DAMAGE EQUAL TO THE SACRIFICED CREATURE'S POWER TO TARGET CREATURE OR PLAYER.",
+            "PUT A WHITE AVATAR CREATURE TOKEN ONTO THE BATTLEFIELD. IT HAS \"THIS CREATURE'S POWER AND TOUGHNESS ARE EACH EQUAL TO YOUR LIFE TOTAL.\"",
+             0.72955237915808924d)]
+        [TestCase("LIGHTNING BOLT DEALS 3 DAMAGE TO TARGET CREATURE OR PLAYER.",
+            "FIREBOLT DEALS 2 DAMAGE TO TARGET CREATURE OR PLAYER. FLASHBACK {4}{R} (YOU MAY CAST THIS CARD FROM YOUR GRAVEYARD FOR ITS FLASHBACK COST. THEN EXILE IT.)",
+             0.99999899999999997)]
+        [TestCase("FIREBOLT DEALS 2 DAMAGE TO TARGET CREATURE OR PLAYER. FLASHBACK {4}{R} (YOU MAY CAST THIS CARD FROM YOUR GRAVEYARD FOR ITS FLASHBACK COST. THEN EXILE IT.)", "LIGHTNING BOLT DEALS 3 DAMAGE TO TARGET CREATURE OR PLAYER.",
+
+            0.60841197203094644d)]
+        public void FuzzyMatchAndFuzzyMatchAlreadyUpperCasedShouldHaveSameResultOnSameInput(string input, string compareTo, double expected)
+        {
+            double standardMatchCaseInsensitive = input.FuzzyMatch(compareTo, false);
+            double matchAlreadyUpperCased = input.FuzzyMatchAlreadyUpperCasedStrings(compareTo);
+
+            Assert.That(matchAlreadyUpperCased,
+                Is.EqualTo(standardMatchCaseInsensitive).And.EqualTo(expected).Within(0.1159));
+        }
+
         [Test]
         [TestCase("Sacrifice a Goblin creature: Airdrop Condor deals damage equal to the sacrificed creature's power to target creature or player.",
             "Put a white Avatar creature token onto the battlefield. It has \"This creature's power and toughness are each equal to your life total.\"",

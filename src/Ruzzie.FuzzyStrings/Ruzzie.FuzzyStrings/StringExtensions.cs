@@ -97,6 +97,39 @@ namespace Ruzzie.FuzzyStrings
             return Cache.GetOrAdd(string.Concat(strA, strB, caseSensitive), key => strA.FuzzyMatchUncached(strB, caseSensitive));
         }
 
+        /// <summary>
+        /// Fuzzy matches the already upperCased strings.
+        /// </summary>
+        /// <param name="strAUpperCase">The string a upper case.</param>
+        /// <param name="strBUppercase">The string b uppercase.</param>
+        /// <returns></returns>
+        /// <remarks>This only works if the caller has already upperCased the strings</remarks>
+        public static double FuzzyMatchAlreadyUpperCasedStrings(this string strAUpperCase, string strBUppercase)
+        {
+            return Cache.GetOrAdd(string.Concat(strAUpperCase, strBUppercase, true, true),
+                key => strAUpperCase.FuzzyMatchAlreadyUpperCasedStringsUncached(strBUppercase));
+        }
+
+        /// <summary>
+        /// Fuzzy matches the already upperCased strings.
+        /// </summary>
+        /// <param name="strAUpperCase">The string a upper case.</param>
+        /// <param name="strBUppercase">The string b uppercase.</param>
+        /// <returns></returns>
+        /// <remarks>This only works if the caller has already upperCased the strings</remarks>
+        public static double FuzzyMatchAlreadyUpperCasedStringsUncached(this string strAUpperCase, string strBUppercase)
+        {
+            string localA = StripAlternativeV2(strAUpperCase.Trim());
+            string localB = StripAlternativeV2(strBUppercase.Trim());
+
+            if (string.Equals(localA, localB, StringComparison.Ordinal))
+            {
+                return ExactMatchProbability;
+            }
+
+            return AvgWeightedHighCoefficient(localA, localB, true, true);
+        }
+
         public static double FuzzyMatchUncached(this string strA, string strB, bool caseSensitive = true)
         {
             string localA = StripAlternativeV2(strA.Trim());
@@ -112,7 +145,6 @@ namespace Ruzzie.FuzzyStrings
                 localA = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(localA);
                 localB = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(localB);
                 isAlreadyToUpper = true;
-
             }
             else
             {              
@@ -122,6 +154,15 @@ namespace Ruzzie.FuzzyStrings
                 }
             }
 
+            return AvgWeightedHighCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
+        }
+
+        private static double AvgWeightedHighCoefficient(
+            string localA,
+            string localB,
+            bool caseSensitive,
+            bool isAlreadyToUpper)
+        {
             if (localA.ContainsString(Space) && localB.ContainsString(Space))
             {
                 var partsA = localA.Split(' ');
@@ -134,7 +175,7 @@ namespace Ruzzie.FuzzyStrings
                 {
                     double high = 0.0;
                     int indexDistance = 0;
-                   
+
                     for (int x = 0; x < partsBLength; x++)
                     {
                         var coefficient = CompositeCoefficient(partsA[i], partsB[x], caseSensitive, isAlreadyToUpper);
@@ -148,9 +189,13 @@ namespace Ruzzie.FuzzyStrings
                     double distanceWeight = indexDistance == 0 ? 1.0 : 1.0 - (indexDistance / ((double) partsALength));
                     weightedHighCoefficientsSum += high * distanceWeight;
                 }
+
                 double avgWeightedHighCoefficient = weightedHighCoefficientsSum / partsALength;
-                return avgWeightedHighCoefficient < 0.999999 ? avgWeightedHighCoefficient : FuzzyMatchMaxProbability; //fudge factor
+                return avgWeightedHighCoefficient < 0.999999
+                    ? avgWeightedHighCoefficient
+                    : FuzzyMatchMaxProbability; //fudge factor
             }
+
             var singleComposite = CompositeCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
             return singleComposite < 0.999999 ? singleComposite : FuzzyMatchMaxProbability; //fudge factor
         }
@@ -250,7 +295,8 @@ namespace Ruzzie.FuzzyStrings
              return input.IndexOf(stringToFind,0, comparison) != -1;
         }
 
-        private static double CompositeCoefficient(string strA,
+        private static double CompositeCoefficient(
+            string strA,
             string strB,
             bool caseSensitive = true,
             bool isAlreadyToUpper = false)
