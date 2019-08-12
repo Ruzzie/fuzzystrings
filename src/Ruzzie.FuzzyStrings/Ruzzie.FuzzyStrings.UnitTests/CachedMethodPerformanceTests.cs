@@ -146,34 +146,6 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         }
 
         [Test]
-        public void StringAtAlternativeTest()
-        {
-            Random random = new Random(13);
-
-            string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures on the battlefield".ToLowerInvariant();
-            string stringToFind = "to the number of creatures";
-
-            
-            Func<bool> original = () =>
-                (sourceString).StringAtOrig(random.Next(sourceString.Length), stringToFind);
-
-            Func<bool> alternative = () =>
-                (sourceString).StringAt(random.Next(sourceString.Length), stringToFind);
-            
-            var numberOfTimesToExecute = 500000;
-            //warmup
-            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(250, alternative);
-            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(250, original);
-
-            //execute
-            alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
-            originalTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, original);
-
-            Console.WriteLine("Original timing: " + originalTimings.TotalMilliseconds);
-            Console.WriteLine("Alternative timing: " + alternativeTimings.TotalMilliseconds);
-        }
-
-        [Test]
         public void StripAlternativeTests()
         {
             Random random = new Random();

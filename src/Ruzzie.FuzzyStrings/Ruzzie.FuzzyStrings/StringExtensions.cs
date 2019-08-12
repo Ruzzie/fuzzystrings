@@ -305,20 +305,36 @@ namespace Ruzzie.FuzzyStrings
             var lcs = strA.LongestCommonSubsequence(strB, caseSensitive, false);
             double levenCoefficient = CalculateLevenshteinDistanceCoefficientForCompositeCoefficient(strA, strB, caseSensitive);//may want to tweak offset
 
-            string strAMp = strA.ToDoubleMetaphone(isAlreadyToUpper);
-            string strBMp = strB.ToDoubleMetaphone(isAlreadyToUpper);
+#if !A
+            
             int matchCount = 0;
-            int strAMpLength = strAMp.Length;
-            if (strAMpLength == 4 && strBMp.Length == 4)
+            if (strA.Length > 4 && strB.Length > 4)
             {
-                for (int i = 0; i < strAMpLength; i++)
+                string strAMp = strA.ToDoubleMetaphone(isAlreadyToUpper);
+                string strBMp = strB.ToDoubleMetaphone(isAlreadyToUpper);
+                int strAMpLength = strAMp.Length;
+                if (strAMpLength == 4 && strAMpLength == strBMp.Length)
                 {
-                    if (strAMp[i] == strBMp[i])
+                    for (int i = 0; i < strAMpLength; i++)
                     {
-                        ++matchCount;
+                        if (strAMp[i] == strBMp[i])
+                        {
+                            ++matchCount;
+                        }
                     }
                 }
             }
+#else
+            unsafe
+            {
+                char* strAMetaphone = stackalloc char[4];
+                int strAMetaphoneLength = DoubleMetaphoneExtensionsAlt.ToDoubleMetaphoneAlt(strA, strAMetaphone, isAlreadyToUpper);
+
+                char* strBMetaphone = stackalloc char[4];
+                int strBMetaphoneLength = DoubleMetaphoneExtensionsAlt.ToDoubleMetaphoneAlt(strA, strBMetaphone, isAlreadyToUpper);
+
+            }
+#endif
             double mpCoefficient = matchCount == 0 ? 0.0 : matchCount / 4.0;
             double avgCoefficient = (dice + lcs.Coefficient + levenCoefficient + mpCoefficient) / 4.0;
             return avgCoefficient;

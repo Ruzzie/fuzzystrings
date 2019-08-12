@@ -143,20 +143,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void StringAtOneParamTests(string input, string stringAt, int atIndex, bool expectedResult)
         {
             Assert.That(DoubleMetaphoneExtensions.StringAt(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAt");
-            Assert.That(DoubleMetaphoneExtensions.StringAtOrig(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAtOrig");
-        }
-
-        [TestCase("{B}{G}", "B", 1, true)]
-        [TestCase("{G}", "G", 1, true)]
-        [TestCase("{G}", "B", 1, false)]
-        [TestCase("", "B", 0, false)]
-        [TestCase("", "", 0, true)]
-        [TestCase("A string original", "original", 0, true)]
-        [TestCase("very much", "very much longer and longer", 0, false)]
-        [TestCase("very much longer", "very much longer and longer", 5, false)]
-        public void StringAtOneOrigParamTests(string input, string stringAt, int atIndex, bool expectedResult)
-        {
-            Assert.That(DoubleMetaphoneExtensions.StringAtOrig(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAtOrig");
+            //Assert.That(DoubleMetaphoneExtensions.StringAtOrig(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAtOrig");
         }
 
         [TestCase("Jensn", "ANSN")]
@@ -181,6 +168,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("3 Harvard Square", "RFRT")]
         [TestCase("Grizzled Angler", "KRSL")]
         [TestCase("Gallegos", "KKS")]
+        [TestCase("Galegas", "KLKS")]
         [TestCase("cabrillo", "KPR")]
         [TestCase("Witzsche", "FFXX")]
         [TestCase("Wiklamab", "FKLM")]
@@ -192,6 +180,9 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void ToDoubleMetaPhoneTests(string input, string expected)
         {
             Assert.That(input.ToDoubleMetaphone(), Is.EqualTo(expected));
+            #if NET46 || NET461 || NET472
+            Assert.That(DoubleMetaphoneExtensionsAlt.ToDoubleMetaphoneAlt(input), Is.EqualTo(expected));
+            #endif
         }
 
         [TestCase("Spotify","Spotfy","Sputfi", "Spotifi")]
