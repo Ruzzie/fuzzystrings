@@ -180,9 +180,9 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void ToDoubleMetaPhoneTests(string input, string expected)
         {
             Assert.That(input.ToDoubleMetaphone(), Is.EqualTo(expected));
-            #if NET46 || NET461 || NET472
-            Assert.That(DoubleMetaphoneExtensionsAlt.ToDoubleMetaphoneAlt(input), Is.EqualTo(expected));
-            #endif
+#if EXPERIMENT
+            Assert.That(DoubleMetaphoneExtensionsAlt.ToDoubleMetaphoneAlt(input,false), Is.EqualTo(expected));
+#endif
         }
 
         [TestCase("Spotify","Spotfy","Sputfi", "Spotifi")]

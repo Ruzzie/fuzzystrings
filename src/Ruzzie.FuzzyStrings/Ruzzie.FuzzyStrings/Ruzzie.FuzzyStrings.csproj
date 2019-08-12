@@ -114,6 +114,11 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>pdbonly</DebugType>
+    <DocumentationFile>Ruzzie.FuzzyStrings.xml</DocumentationFile>
+  </PropertyGroup>
+
   <!--<PropertyGroup Condition=" '$(TargetFramework)' == 'portable40-net45+sl5+win8+wp8+wpa81' ">
     <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
   </PropertyGroup>-->

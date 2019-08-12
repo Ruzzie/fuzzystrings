@@ -7,7 +7,7 @@ namespace Ruzzie.FuzzyStrings
 {
     
     /// <summary>
-    /// DoubleMetaphone string extension
+    /// DONT USE, FOR EXPERIMENTAL USE ONLY
     /// </summary>
     /// <remarks>
     /// Original C++ implementation:
@@ -48,41 +48,40 @@ namespace Ruzzie.FuzzyStrings
             }
             
         }
-        public static unsafe string ToDoubleMetaphoneUncachedAlt(this string input, bool isAlreadyToUpper = false)
-        {
-            var inputLength = input.Length;
 
-            if (inputLength < 1)
-            {
-                return input;
-            }
+         public static unsafe string ToDoubleMetaphoneUncachedAlt(this string input, bool isAlreadyToUpper = false)
+         {
+             var inputLength = input.Length;
 
-            int current = 0;
+             if (inputLength < 1)
+             {
+                 return input;
+             }
 
-            var workingStringLength = inputLength + 1;
-            char* workingString = stackalloc char[workingStringLength];
-            // string workingString;
-            if (isAlreadyToUpper)
-            {
-                //unsafe concat add space to end
-                fixed (char* ptr = input)
-                {
-                    Buffer.MemoryCopy(ptr, workingString, workingStringLength * 2, inputLength * 2);
-                    workingString[workingStringLength] = ' ';
-                }
-            }
-            else
-            {
-                //unsafe concat add space to end
-                fixed (char* ptr = input)
-                {
-                    Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(ptr, 0, inputLength);
-                    Buffer.MemoryCopy(ptr, workingString, workingStringLength * 2, inputLength * 2);
-                    workingString[workingStringLength] = ' ';
-                }
-            }
-            
-            bool isSlavoGermanic = IsSlavoGermanic(workingString, workingStringLength);
+             int current = 0;
+
+             var workingStringLength = inputLength + 1;
+             char* workingString = stackalloc char[workingStringLength];
+             fixed (char* ptr = input)
+             {
+                 // string workingString;
+                 if (isAlreadyToUpper)
+                 {
+                     //unsafe concat add space to end
+
+                     Buffer.MemoryCopy(ptr, workingString, workingStringLength * 2, inputLength * 2);
+                     workingString[workingStringLength] = ' ';
+                 }
+                 else
+                 {
+                     //unsafe concat add space to end
+                     Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(ptr, 0, inputLength);
+                     Buffer.MemoryCopy(ptr, workingString, workingStringLength * 2, inputLength * 2);
+                     workingString[workingStringLength] = ' ';
+                 }
+             }
+
+             bool isSlavoGermanic = IsSlavoGermanic(workingString, workingStringLength);
 
             //skip these when at start of word: MegaphonesToSkipAtStartOfWord
             if (StringAt(workingString, workingStringLength, 0, strGN, strKN, strPN, strWR, strPS))
@@ -1324,17 +1323,18 @@ namespace Ruzzie.FuzzyStrings
 
         static unsafe bool StringAt(char* self, int selfLength, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h, string i, string j, string k)
         {
-            return StringAt(self,selfLength, startIndex, a, b, c, d) ||
-                   StringAt(self,selfLength, startIndex, e, f, g, h) || 
-                   StringAt(self,selfLength, startIndex, i, j, k);
+            return StringAt(self, selfLength, startIndex, a, b, c, d) ||
+                   StringAt(self, selfLength, startIndex, e, f, g, h) ||
+                   StringAt(self, selfLength, startIndex, i, j, k);
         }
-
-
-#if !PORTABLE && HAVE_METHODINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        
         static unsafe bool StringAt(char* self, int selfLength, int startIndex, char* valuePtr, int valueLength)
         {
+            if (startIndex < 0)
+            {
+                startIndex = 0;
+            }
+
             if (selfLength - startIndex - valueLength < 0)
             {
                 return false;
@@ -1346,7 +1346,6 @@ namespace Ruzzie.FuzzyStrings
                     
             while (pos < valueLength)
             {
-                        
                 if (*startSelf != *startValue)
                 {
                     return false;
@@ -1362,11 +1361,6 @@ namespace Ruzzie.FuzzyStrings
 
         static unsafe bool StringAt(char* input, int inputLength, int startIndex, string value)
         {
-            if (startIndex < 0)
-            {
-                startIndex = 0;
-            }
-
             fixed (char* valuePtr = value)
             {
                 var selfLength = inputLength;
