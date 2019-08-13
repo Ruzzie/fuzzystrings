@@ -12,16 +12,20 @@ namespace Ruzzie.FuzzyStrings
         public static LongestCommonSubsequenceResult LongestCommonSubsequence(this string input,
             string comparedTo,
             bool caseSensitive = false,
-            bool includeLongestSubsequenceInResult = true)
+            bool includeLongestSubsequenceInResult = true,
+            bool alreadyUpperCased = false
+            )
         {
-            return input.LongestCommonSubsequenceUncached(comparedTo, caseSensitive, includeLongestSubsequenceInResult);
+            return input.LongestCommonSubsequenceUncached(comparedTo, caseSensitive, includeLongestSubsequenceInResult, alreadyUpperCased);
         }
 
         private static LongestCommonSubsequenceResult LongestCommonSubsequenceUncachedWithResult(string input,
             string comparedTo,
-            bool caseSensitive)
+            bool caseSensitive,
+            bool alreadyUpperCased = false
+            )
         {
-            if (!caseSensitive)
+            if (!caseSensitive && ! alreadyUpperCased)
             {
                 input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
                 comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);
@@ -132,11 +136,13 @@ namespace Ruzzie.FuzzyStrings
         /// <param name="comparedTo"></param>
         /// <param name="caseSensitive"></param>
         /// <param name="includeLongestSubsequenceInResult"></param>
+        /// <param name="alreadyUpperCased">Indicates if the input and comparedTo string are already upperCased.</param>
         /// <returns>Returns a Tuple of the sub sequence string and the match coefficient.</returns>
         public static LongestCommonSubsequenceResult LongestCommonSubsequenceUncached(this string input,
             string comparedTo,
             bool caseSensitive = false,
-            bool includeLongestSubsequenceInResult = true)
+            bool includeLongestSubsequenceInResult = true,
+            bool alreadyUpperCased = false)
         {
             if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
             {
@@ -145,10 +151,10 @@ namespace Ruzzie.FuzzyStrings
 
             if (includeLongestSubsequenceInResult)
             {
-                return LongestCommonSubsequenceUncachedWithResult(input, comparedTo, caseSensitive);
+                return LongestCommonSubsequenceUncachedWithResult(input, comparedTo, caseSensitive, alreadyUpperCased);
             }
 
-            return LongestCommonSubsequenceWithoutSubsequenceAlternative(input, comparedTo, caseSensitive);
+            return LongestCommonSubsequenceWithoutSubsequenceAlternative(input, comparedTo, caseSensitive, alreadyUpperCased);
         }
 
         /// <summary>
@@ -157,7 +163,8 @@ namespace Ruzzie.FuzzyStrings
         public static LongestCommonSubsequenceResult LongestCommonSubsequenceWithoutSubsequenceAlternative(
             this string input,
             string comparedTo,
-            bool caseSensitive = false
+            bool caseSensitive = false,
+            bool alreadyUpperCased = false
         )
         {
             if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
@@ -165,7 +172,7 @@ namespace Ruzzie.FuzzyStrings
                 return EmptyResult;
             }
 
-            if (!caseSensitive)
+            if (!caseSensitive && !alreadyUpperCased)
             {
                 input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
                 comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);

@@ -29,10 +29,8 @@ namespace Ruzzie.FuzzyStrings
         {
             unsafe
             {
-                //var input = inputOriginal;//SinglePercent + inputOriginal + SinglePound;//string.Concat(SinglePercent, input, SinglePound);
                 int inputNgramsLength = input.Length -1;
 
-               // var comparedTo = comparedToOriginal; //SinglePercent + comparedToOriginal + SinglePound;//string.Concat(SinglePercent, comparedTo, SinglePound);
                 int comparedToNgramsLength = comparedTo.Length - 1;
 
                 if (inputNgramsLength < 1 || comparedToNgramsLength < 1)

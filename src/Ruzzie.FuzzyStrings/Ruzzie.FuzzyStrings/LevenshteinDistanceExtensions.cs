@@ -5,9 +5,9 @@ namespace Ruzzie.FuzzyStrings
 {
     public static class LevenshteinDistanceExtensions
     {
-        public static int LevenshteinDistance(this string input, string comparedTo, bool caseSensitive = false)
+        public static int LevenshteinDistance(this string input, string comparedTo, bool caseSensitive = false,  bool alreadyUpperCased = false)
         {
-            return LevenshteinDistanceUncachedAlternativeV2(input, comparedTo, caseSensitive);
+            return LevenshteinDistanceUncachedAlternativeV2(input, comparedTo, caseSensitive, alreadyUpperCased);
         }
 
 
@@ -87,7 +87,8 @@ namespace Ruzzie.FuzzyStrings
 
         public static int LevenshteinDistanceUncachedAlternativeV2(this string input,
             string comparedTo,
-            bool caseSensitive = false)
+            bool caseSensitive = false,
+            bool alreadyUpperCased = false)
         {
 
             if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(comparedTo))
@@ -95,7 +96,7 @@ namespace Ruzzie.FuzzyStrings
                 return -1;
             }
 
-            if (!caseSensitive)
+            if (!caseSensitive && !alreadyUpperCased)
             {
                 input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
                 comparedTo = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(comparedTo);
