@@ -21,37 +21,26 @@ namespace Ruzzie.FuzzyStrings
             return input.ToDoubleMetaphoneUncachedAlt(isAlreadyToUpper);
         }
 
-        static unsafe bool IsSlavoGermanic(char* inputPtr, int inputLength)
+        /// <summary>
+        /// Creates metaphone for the given string.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="isAlreadyToUpper">if set to <c>true</c> [is already to upper].</param>
+        /// <param name="metaphoneBuffer">The metaphone buffer to fill, this must be length 4.</param>
+        /// <param name="metaphoneBufferLength">Length of the metaphone written to the buffer.</param>
+        internal static unsafe void ToDoubleMetaphoneAlt(this string input, bool isAlreadyToUpper, char* metaphoneBuffer, out int metaphoneBufferLength)
         {
-            fixed (char* czPtr = strCZ, witzPtr = strWITZ)
-            {
-                for (int i = 0; i < inputLength; i++)
-                {
-                    char currChar = inputPtr[i];
-                    if (currChar == charW || currChar == charK)
-                    {
-                        return true;
-                    }
-
-                    if (StringAt(inputPtr, inputLength, i, czPtr, 2)
-                        ||
-                        StringAt(inputPtr, inputLength, i, witzPtr, 4)
-                    )
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
+            input.ToDoubleMetaphoneUncachedAlt(isAlreadyToUpper,metaphoneBuffer, out metaphoneBufferLength);
         }
-        public static char[] ToDoubleMetaphoneUncachedAlt(this string input, bool isAlreadyToUpper = false)
+
+        private static unsafe void ToDoubleMetaphoneUncachedAlt(this string input, bool isAlreadyToUpper, char* metaphoneBuffer, out int metaphoneBufferLength)
         {
-            var inputLength = input.Length;
+             var inputLength = input.Length;
 
             if (inputLength < 1)
             {
-                return input.ToCharArray();
+                metaphoneBufferLength = 0;
+                return; //input.ToCharArray();
             }
 
             int current = 0;
@@ -81,35 +70,71 @@ namespace Ruzzie.FuzzyStrings
                 ++current;
             }
 
-            unsafe
+            //Dirty, dirty, but lets see if we can reduce allocation time and GC time as well as unnecessary resizing of StringBuilder.
+            var bufferSize = 16;
+            char* primary = stackalloc char[bufferSize];
+            char* secondary = stackalloc char[bufferSize];
+
+            MetaphoneBuffer metaphoneData = new MetaphoneBuffer(bufferSize, primary, secondary);
+
+            //Initial 'X' is pronounced 'Z' e.g. 'Xavier'
+            if (workingString[0] == charX)
             {
-                //Dirty, dirty, but lets see if we can reduce allocation time and GC time as well as unnecessary resizing of StringBuilder.
-                var bufferSize = 16;
-                char* primary = stackalloc char[bufferSize];
-                char* secondary = stackalloc char[bufferSize];
+                metaphoneData.Add(charS); //'Z' maps to 'S'
+                ++current;
+            }
 
-                MetaphoneBuffer metaphoneData = new MetaphoneBuffer(bufferSize, primary, secondary);
-
-                //Initial 'X' is pronounced 'Z' e.g. 'Xavier'
-                if (workingString[0] == charX)
+            while ((metaphoneData.PrimaryIndex < 4) || (metaphoneData.SecondaryIndex < 4))
+            {
+                if (current >= inputLength)
                 {
-                    metaphoneData.Add(charS); //'Z' maps to 'S'
-                    ++current;
+                    break;
                 }
 
-                while ((metaphoneData.PrimaryIndex < 4) || (metaphoneData.SecondaryIndex < 4))
+                current = MapCharacter(workingString, current, ref metaphoneData, isSlavoGermanic, inputLength - 1);//zero based index
+            }
+
+            metaphoneData.CopyTo(metaphoneBuffer, out metaphoneBufferLength);
+        }
+
+        static unsafe bool IsSlavoGermanic(char* inputPtr, int inputLength)
+        {
+            fixed (char* czPtr = strCZ, witzPtr = strWITZ)
+            {
+                for (int i = 0; i < inputLength; i++)
                 {
-                    if (current >= inputLength)
+                    char currChar = inputPtr[i];
+                    if (currChar == charW || currChar == charK)
                     {
-                        break;
+                        return true;
                     }
 
-                    current = MapCharacter(workingString, current, ref metaphoneData, isSlavoGermanic, inputLength - 1);//zero based index
+                    if (StringAt(inputPtr, inputLength, i, czPtr, 2)
+                        ||
+                        StringAt(inputPtr, inputLength, i, witzPtr, 4)
+                    )
+                    {
+                        return true;
+                    }
                 }
 
-                return metaphoneData.ToCharArray();
+                return false;
             }
-         
+        }
+
+        public static char[] ToDoubleMetaphoneUncachedAlt(this string input, bool isAlreadyToUpper = false)
+        {
+           char[] buffer = new char[4];
+           int length;
+           unsafe
+           {
+               fixed (char* bufferPtr = buffer)
+               {
+                   ToDoubleMetaphoneUncachedAlt(input, isAlreadyToUpper, bufferPtr, out length);
+               }
+           }
+           Array.Resize(ref buffer, length);
+           return buffer;
         }
 
         //Don't use this struct, it is only used in this specialized edge case for perf. (Yes perf, was tested and profiled).
@@ -231,6 +256,29 @@ namespace Ruzzie.FuzzyStrings
                 }
                
                 return result;
+            }
+
+            public void CopyTo(char* buffer, out int length)
+            {
+                if (_alternative)
+                {
+                    length = Math.Min(4, SecondaryIndex);
+
+                    for (int i = 0; i < length; i++)
+                    {
+                        buffer[i] = Secondary[i];
+                    }
+
+                    return;
+                }
+
+                length = Math.Min(4, PrimaryIndex);
+
+                for (int i = 0; i < length; i++)
+                {
+                    buffer[i] = Primary[i];
+                }
+                return;
             }
         }
         private static int MapCharacter(in string workingString, int current, ref MetaphoneBuffer metaphoneData, bool isSlavoGermanic, int last)

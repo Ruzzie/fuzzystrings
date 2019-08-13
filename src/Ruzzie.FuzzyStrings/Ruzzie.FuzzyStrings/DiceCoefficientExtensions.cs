@@ -11,7 +11,6 @@ namespace Ruzzie.FuzzyStrings
         private const string DoublePercent = "&&";
         private const string DoublePound = "##";
 
-
         public static double DiceCoefficient(this string input, string comparedTo)
         {
             return DiceCoefficientAlternativeV2(input, comparedTo);

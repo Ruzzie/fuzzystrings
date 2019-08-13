@@ -341,19 +341,28 @@ namespace Ruzzie.FuzzyStrings
             int matchCount = 0;
             if (strA.Length > 4 && strB.Length > 4)
             {
-                var strAMp = strA.ToDoubleMetaphoneAlt(isAlreadyToUpper);
-                var strBMp = strB.ToDoubleMetaphoneAlt(isAlreadyToUpper);
-                int strAMpLength = strAMp.Length;
-                if (strAMpLength == 4 && strAMpLength == strBMp.Length)
+                unsafe
                 {
-                    for (int i = 0; i < strAMpLength; i++)
+                    char* strAMp = stackalloc char[4];
+                    char* strBMp = stackalloc char[4];
+
+                    strA.ToDoubleMetaphoneAlt(isAlreadyToUpper, strAMp, out int strAMpLength);
+                    strB.ToDoubleMetaphoneAlt(isAlreadyToUpper, strBMp, out int strBMpLength);
+                    
+                    if (strAMpLength == 4 && strAMpLength == strBMpLength)
                     {
-                        if (strAMp[i] == strBMp[i])
+                        for (int i = 0; i < strAMpLength; i++)
                         {
-                            ++matchCount;
+                            if (strAMp[i] == strBMp[i])
+                            {
+                                ++matchCount;
+                            }
                         }
                     }
                 }
+                //var strAMp = strA.ToDoubleMetaphoneAlt(isAlreadyToUpper);
+                //var strBMp = strB.ToDoubleMetaphoneAlt(isAlreadyToUpper);
+                //int strAMpLength = strAMp.Length;
             }
 
             double mpCoefficient = matchCount == 0 ? 0.0 : matchCount / 4.0;
