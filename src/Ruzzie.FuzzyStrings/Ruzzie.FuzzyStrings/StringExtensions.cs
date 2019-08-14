@@ -295,6 +295,11 @@ namespace Ruzzie.FuzzyStrings
                 {
                     for (int i = 0; i < aLength; i++)
                     {
+                        if (bLength > (aLength - i))
+                        {
+                            return false;
+                        }
+
                         var hasStringAt = DoubleMetaphoneExtensionsAlt.StringAt(strAPtr, aLength, i, strBPtr, bLength);
                         if (hasStringAt)
                         {

@@ -1407,7 +1407,6 @@ namespace Ruzzie.FuzzyStrings
                     
             while (pos < valueLength)
             {
-                        
                 if (*startSelf != *startValue)
                 {
                     return false;

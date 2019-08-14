@@ -388,8 +388,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("", " ", false)]
         [TestCase("", "", false)]
         [TestCase("a creature", "creature a", false)]
-        [TestCase("creature", "creature",true)]
+        [TestCase("creature", "creature", true)]
+        [TestCase("creature", "creatures", false)]
         [TestCase("creature", "crea",true)]
+        [TestCase("DOCTOR", "CREATU",false)]
+        [TestCase("DOCTOR", "DOCTOR",true)]
         [TestCase("deals 3 damage to target creature or player.",
             "to target creature or player.",
             true)]
