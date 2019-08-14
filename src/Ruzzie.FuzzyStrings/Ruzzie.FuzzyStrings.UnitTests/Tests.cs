@@ -380,5 +380,22 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             var msg = $"LevenshteinDistance of \"{match}\" against \"{input}\" was {result}, expecting {expectedResult}.";
             Assert.AreEqual(expectedResult, result, double.Epsilon, msg);
         }
+
+        [Theory]
+        [TestCase("kitten", "sitting", false)]
+        [TestCase("kitten", "", false)]
+        [TestCase("kitten ", " ", true)]
+        [TestCase("", " ", false)]
+        [TestCase("", "", false)]
+        [TestCase("a creature", "creature a", false)]
+        [TestCase("creature", "creature",true)]
+        [TestCase("creature", "crea",true)]
+        [TestCase("deals 3 damage to target creature or player.",
+            "to target creature or player.",
+            true)]
+        public void StringContainsTest(string a, string b, bool expectedResult)
+        {
+            Assert.That(a.ContainsString(b), Is.EqualTo(expectedResult));
+        }
     }
 }

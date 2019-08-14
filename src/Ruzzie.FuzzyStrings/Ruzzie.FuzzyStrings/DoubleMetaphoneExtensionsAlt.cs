@@ -1391,6 +1391,11 @@ namespace Ruzzie.FuzzyStrings
 #endif
         internal static unsafe bool StringAt(char* selfPtr, int selfLength, int startIndex, char* valuePtr, int valueLength)
         {
+            if (valueLength == 0)
+            {
+                return false;
+            }
+
             if (selfLength - startIndex - valueLength < 0)
             {
                 return false;

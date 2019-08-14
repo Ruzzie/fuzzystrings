@@ -287,7 +287,23 @@ namespace Ruzzie.FuzzyStrings
 
         public static bool ContainsString(this string input, string stringToFind)
         {
-            return input.Contains(stringToFind);
+            unsafe
+            {
+                int aLength = input.Length;
+                int bLength = stringToFind.Length;
+                fixed (char* strAPtr = input, strBPtr = stringToFind)
+                {
+                    for (int i = 0; i < aLength; i++)
+                    {
+                        var hasStringAt = DoubleMetaphoneExtensionsAlt.StringAt(strAPtr, aLength, i, strBPtr, bLength);
+                        if (hasStringAt)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
         }
 
         public static bool AnyString(this string input, string stringToFind, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
