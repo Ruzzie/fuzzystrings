@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Runtime.CompilerServices;
 
 namespace Ruzzie.FuzzyStrings
@@ -45,27 +44,21 @@ namespace Ruzzie.FuzzyStrings
 
             int current = 0;
 
-            string workingString;
-            if (isAlreadyToUpper)
+            
+            if (!isAlreadyToUpper)
             {
-                workingString = string.Concat(input, " ");
-            }
-            else
-            {
-                workingString = string.Concat(Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input), " ");
+                input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
             }
             
             bool isSlavoGermanic;
-            unsafe
+
+            fixed (char* ptr = input)
             {
-                fixed (char* ptr = workingString)
-                {
-                    isSlavoGermanic = IsSlavoGermanic(ptr, inputLength);
-                }
+                isSlavoGermanic = IsSlavoGermanic(ptr, inputLength);
             }
 
             //skip these when at start of word: MegaphonesToSkipAtStartOfWord
-            if (workingString.StringAt(0, strGN, strKN, strPN, strWR, strPS))
+            if (input.StringAt(0, strGN, strKN, strPN, strWR, strPS))
             {
                 ++current;
             }
@@ -78,7 +71,7 @@ namespace Ruzzie.FuzzyStrings
             MetaphoneBuffer metaphoneData = new MetaphoneBuffer(bufferSize, primary, secondary);
 
             //Initial 'X' is pronounced 'Z' e.g. 'Xavier'
-            if (workingString[0] == charX)
+            if (CharAtOrSpaceWhenOutOfRange(input, 0) == charX)
             {
                 metaphoneData.Add(charS); //'Z' maps to 'S'
                 ++current;
@@ -91,12 +84,24 @@ namespace Ruzzie.FuzzyStrings
                     break;
                 }
 
-                current = MapCharacter(workingString, current, ref metaphoneData, isSlavoGermanic, inputLength - 1);//zero based index
+                current = MapCharacter(input, current, ref metaphoneData, isSlavoGermanic, inputLength - 1);//zero based index
             }
 
             metaphoneData.CopyTo(metaphoneBuffer, out metaphoneBufferLength);
         }
 
+#if !PORTABLE && HAVE_METHODINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        static char CharAtOrSpaceWhenOutOfRange(in string value, int index)
+        {
+            if (index < value.Length)
+            {
+                return value[index];
+            }
+
+            return ' ';
+        }
         static unsafe bool IsSlavoGermanic(char* inputPtr, int inputLength)
         {
             fixed (char* czPtr = strCZ, witzPtr = strWITZ)
@@ -283,7 +288,7 @@ namespace Ruzzie.FuzzyStrings
         }
         private static int MapCharacter(in string workingString, int current, ref MetaphoneBuffer metaphoneData, bool isSlavoGermanic, int last)
         {
-            switch (workingString[current])
+            switch (CharAtOrSpaceWhenOutOfRange(workingString, current))
             {
                 case charA:
                 case charE:
@@ -303,7 +308,8 @@ namespace Ruzzie.FuzzyStrings
                     //"-mb", e.g", "dumb", already skipped over...
                     metaphoneData.Add('P');
 
-                    if (workingString[current + 1] == charB)
+                    
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charB)
                     {
                         current += 2;
                     }
@@ -354,7 +360,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charF:
-                    if (workingString[current + 1] == charF)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charF)
                     {
                         current += 2;
                     }
@@ -370,7 +376,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
                 case 'H':
                     //only keep if first & before vowel or btw. 2 vowels
-                    if (((current == 0) || IsVowel(workingString[current - 1])) && IsVowel(workingString[current + 1]))
+                    if (((current == 0) || IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current - 1))) && IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current + 1)))
                     {
                         metaphoneData.Add(charH);
                         current += 2;
@@ -385,7 +391,7 @@ namespace Ruzzie.FuzzyStrings
                     //obvious spanish, 'jose', 'san jacinto'
                     if (StringAt(workingString, current, strJOSE) || StringAt(workingString, 0, strSANsp))
                     {
-                        if (((current == 0) && (workingString[current + 4] == ' ')) || StringAt(workingString, 0, strSANsp))
+                        if (((current == 0) && (CharAtOrSpaceWhenOutOfRange(workingString, current + 4) == ' ')) || StringAt(workingString, 0, strSANsp))
                         {
                             metaphoneData.Add(charH);
                         }
@@ -404,9 +410,9 @@ namespace Ruzzie.FuzzyStrings
                     else
                     //spanish pron. of e.g. 'bajador'
                         if (current > 0
-                            && IsVowel(workingString[current - 1])
-                            && !isSlavoGermanic && ((workingString[current + 1] == charA)
-                                                    || (workingString[current + 1] == charO)))
+                            && IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current - 1))
+                            && !isSlavoGermanic && ((CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charA)
+                                                    || (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charO)))
                         {
                             metaphoneData.Add(strJ, strH);
                         }
@@ -420,7 +426,7 @@ namespace Ruzzie.FuzzyStrings
                             metaphoneData.Add(charJ);
                         }
 
-                    if (workingString[current + 1] == charJ) //it could happen!
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charJ) //it could happen!
                     {
                         current += 2;
                     }
@@ -431,7 +437,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charK:
-                    if (workingString[current + 1] == charK)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charK)
                     {
                         current += 2;
                     }
@@ -443,10 +449,10 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charL:
-                    if (workingString[current + 1] == charL)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charL)
                     {
                         //spanish e.g. 'cabrillo', 'gallegos'
-                        if (((current == (workingString.Length - 4))//-4 instead of -3 since a space is added to workingString
+                        if (((current == (workingString.Length - 3))//-3 since NO space is added to workingString
                              && StringAt(workingString, (current - 1), strILLO, strILLA, strALLE))
                             || ((StringAt(workingString, (last - 1), strAS, strOS)
                                  || StringAt(workingString, last, strA, strO))
@@ -469,7 +475,7 @@ namespace Ruzzie.FuzzyStrings
                     if ((StringAt(workingString, (current - 1), strUMB)
                          && (((current + 1) == last)
                              || StringAt(workingString, (current + 2), strER))) //'dumb','thumb'
-                        || (workingString[current + 1] == charM))
+                        || (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charM))
                     {
                         current += 2;
                     }
@@ -481,7 +487,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charN:
-                    if (workingString[current + 1] == charN)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charN)
                     {
                         current += 2;
                     }
@@ -498,7 +504,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charP:
-                    if (workingString[current + 1] == charH)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charH)
                     {
                         metaphoneData.Add(charF);
                         current += 2;
@@ -518,7 +524,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charQ:
-                    if (workingString[current + 1] == charQ)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charQ)
                     {
                         current += 2;
                     }
@@ -542,7 +548,7 @@ namespace Ruzzie.FuzzyStrings
                         metaphoneData.Add(charR);
                     }
 
-                    if (workingString[current + 1] == charR)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charR)
                     {
                         current += 2;
                     }
@@ -599,7 +605,7 @@ namespace Ruzzie.FuzzyStrings
                     break;
 
                 case charV:
-                    if (workingString[current + 1] == charV)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charV)
                     {
                         current += 2;
                     }
@@ -619,11 +625,11 @@ namespace Ruzzie.FuzzyStrings
                         break;
                     }
 
-                    if ((current == 0) && (IsVowel(workingString[current + 1])
+                    if ((current == 0) && (IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current + 1))
                                            || StringAt(workingString, current, strWH)))
                     {
                         //Wasserman should match Vasserman
-                        if (IsVowel(workingString[current + 1]))
+                        if (IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current + 1)))
                         {
                             metaphoneData.Add(strA, strF);
                         }
@@ -635,7 +641,7 @@ namespace Ruzzie.FuzzyStrings
                     }
 
                     //Arnow should match Arnoff
-                    if ((current == last && current > 0 && IsVowel(workingString[current - 1]))
+                    if ((current == last && current > 0 && IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current - 1)))
                         || StringAt(workingString, (current - 1), strEWSKI, strEWSKY, strOWSKI, strOWSKY)
                         || StringAt(workingString, 0, strSCH))
                     {
@@ -677,14 +683,14 @@ namespace Ruzzie.FuzzyStrings
 
                 case charZ:
                     //chinese pinyin e.g. 'zhao'
-                    if (workingString[current + 1] == charH)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charH)
                     {
                         metaphoneData.Add(charJ);
                         current += 2;
                         break;
                     }
                     else if (StringAt(workingString, (current + 1), strZO, strZI, strZA)
-                             || (isSlavoGermanic && ((current > 0) && workingString[current - 1] != charT)))
+                             || (isSlavoGermanic && ((current > 0) && CharAtOrSpaceWhenOutOfRange(workingString, current - 1) != charT)))
                     {
                         metaphoneData.Add(strS, strTS);
                     }
@@ -693,7 +699,7 @@ namespace Ruzzie.FuzzyStrings
                         metaphoneData.Add(charS);
                     }
 
-                    if (workingString[current + 1] == charZ)
+                    if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charZ)
                     {
                         current += 2;
                     }
@@ -778,7 +784,7 @@ namespace Ruzzie.FuzzyStrings
             if (StringAt(workingString, current, strSC))
             {
                 //Schlesinger's rule
-                if (workingString[current + 2] == charH)
+                if (CharAtOrSpaceWhenOutOfRange(workingString, current + 2) == charH)
                 {
                     //dutch origin, e.g. 'school', 'schooner'
                     if (StringAt(workingString, (current + 3), strOO, strER, strEN, strUY, strED, strEM))
@@ -797,7 +803,7 @@ namespace Ruzzie.FuzzyStrings
                     }
                     else
                     {
-                        if ((current == 0) && !IsVowel(workingString[3]) && (workingString[3] != charW))
+                        if ((current == 0) && !IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, 3)) && (CharAtOrSpaceWhenOutOfRange(workingString, 3) != charW))
                         {
                             metaphoneData.Add(strX, strS);
                         }
@@ -845,9 +851,9 @@ namespace Ruzzie.FuzzyStrings
 
         private static int MapCharacterG(string workingString, int current, ref MetaphoneBuffer metaphoneData, bool isSlavoGermanic)
         {
-            if (workingString[current + 1] == charH)
+            if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charH)
             {
-                if ((current > 0) && !IsVowel(workingString[current - 1]))
+                if ((current > 0) && !IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current - 1)))
                 {
                     metaphoneData.Add(charK);
                     current += 2;
@@ -859,7 +865,7 @@ namespace Ruzzie.FuzzyStrings
                     //'ghislane', ghiradelli
                     if (current == 0)
                     {
-                        if (workingString[current + 2] == charI)
+                        if (CharAtOrSpaceWhenOutOfRange(workingString, current + 2) == charI)
                         {
                             metaphoneData.Add(charJ);
                         }
@@ -882,12 +888,12 @@ namespace Ruzzie.FuzzyStrings
                 else
                 {
                     //e.g., 'laugh', 'McLaughlin', 'cough', 'gough', 'rough', 'tough'
-                    if ((current > 2) && (workingString[current - 1] == charU)
+                    if ((current > 2) && (CharAtOrSpaceWhenOutOfRange(workingString, current - 1) == charU)
                         && StringAt(workingString, (current - 3), strC, strG, strL, strR, strT))
                     {
                         metaphoneData.Add(charF);
                     }
-                    else if ((current > 0) && workingString[current - 1] != charI)
+                    else if ((current > 0) && CharAtOrSpaceWhenOutOfRange(workingString, current - 1) != charI)
                     {
                         metaphoneData.Add(charK);
                     }
@@ -897,16 +903,16 @@ namespace Ruzzie.FuzzyStrings
                 }
             }
 
-            if (workingString[current + 1] == charN)
+            if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charN)
             {
-                if ((current == 1) && IsVowel(workingString[0]) && !isSlavoGermanic)
+                if ((current == 1) && IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, 0)) && !isSlavoGermanic)
                 {
                     metaphoneData.Add(strKN, strN);
                 }
                 else
                 //not e.g. 'cagney'
                     if (!StringAt(workingString, (current + 2), strEY)
-                        && (workingString[current + 1] != charY) && !isSlavoGermanic)
+                        && (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) != charY) && !isSlavoGermanic)
                     {
                         metaphoneData.Add(strN, strKN);
                     }
@@ -928,7 +934,7 @@ namespace Ruzzie.FuzzyStrings
 
             //-ges-,-gep-,-gel-, -gie- at beginning
             if ((current == 0)
-                && ((workingString[current + 1] == charY)
+                && ((CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charY)
                     || StringAt(workingString, (current + 1), strES, strEP, strEB, strEL, strEY, strIB, strIL, strIN, strIE, strEI, strER)))
             {
                 metaphoneData.Add(strK, strJ);
@@ -938,7 +944,7 @@ namespace Ruzzie.FuzzyStrings
 
             // -ger-,  -gy-
             if ((StringAt(workingString, (current + 1), strER)
-                 || (workingString[current + 1] == charY))
+                 || (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charY))
                 && !StringAt(workingString, 0, strDANGER, strRANGER, strMANGER)
                 && !StringAt(workingString, (current - 1), strE, strI)
                 && !StringAt(workingString, (current - 1), strRGY, strOGY))
@@ -973,7 +979,7 @@ namespace Ruzzie.FuzzyStrings
                 return current;
             }
 
-            if (workingString[current + 1] == charG)
+            if (CharAtOrSpaceWhenOutOfRange(workingString, current + 1) == charG)
             {
                 current += 2;
             }
@@ -990,10 +996,10 @@ namespace Ruzzie.FuzzyStrings
         {
 //various germanic
             if ((current > 1)
-                && !IsVowel(workingString[current - 2])
+                && !IsVowel(CharAtOrSpaceWhenOutOfRange(workingString, current - 2))
                 && StringAt(workingString, (current - 1), strACH)
-                && ((workingString[current + 2] != charI)
-                    && ((workingString[current + 2] != charE)
+                && ((CharAtOrSpaceWhenOutOfRange(workingString, current + 2) != charI)
+                    && ((CharAtOrSpaceWhenOutOfRange(workingString, current + 2) != charE)
                         || StringAt(workingString, (current - 2), strBACHER, strMACHER))))
             {
                 metaphoneData.Add(charK);
@@ -1088,14 +1094,14 @@ namespace Ruzzie.FuzzyStrings
             }
 
             //double 'C', but not if e.g. 'McClellan'
-            if (StringAt(workingString, current, strCC) && !((current == 1) && (workingString[0] == charM)))
+            if (StringAt(workingString, current, strCC) && !((current == 1) && (CharAtOrSpaceWhenOutOfRange(workingString, 0) == charM)))
             {
                 //'bellocchio' but not 'bacchus'
                 if (StringAt(workingString, (current + 2), strI, strE, strH)
                     && !StringAt(workingString, (current + 2), strHU))
                 {
                     //'accident', 'accede' 'succeed'
-                    if (((current == 1) && (workingString[current - 1] == charA))
+                    if (((current == 1) && (CharAtOrSpaceWhenOutOfRange(workingString, current - 1) == charA))
                         || StringAt(workingString, (current - 1), strUCCEE, strUCCES))
                     {
                         metaphoneData.Add(strKS);

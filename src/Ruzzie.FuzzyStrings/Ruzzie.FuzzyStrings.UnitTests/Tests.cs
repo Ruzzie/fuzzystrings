@@ -177,6 +177,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("Gnollero", "NLR")]
         [TestCase("Psollero", "SLR")]
         [TestCase("Honorificabilitudinitatibus", "HNRF")]
+        [TestCase("SCH", "S")]
         public void ToDoubleMetaPhoneTests(string input, string expected)
         {
             Assert.That(input.ToDoubleMetaphone(), Is.EqualTo(expected));
