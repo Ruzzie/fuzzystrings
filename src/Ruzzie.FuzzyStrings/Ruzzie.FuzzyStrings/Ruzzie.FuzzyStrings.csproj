@@ -6,7 +6,7 @@
     <AssemblyTitle>Ruzzie.FuzzyStrings</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Dorus Verhoeckx</Authors>
-    <TargetFrameworks>net40;net45;net451;net46;net461;net472;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net45;net451;net46;net461;net472;netstandard2.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Ruzzie.FuzzyStrings</AssemblyName>
@@ -39,7 +39,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="3.0.0.113" />
+    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.0.0.118" />
     <PackageReference Include="Ruzzie.Common" Version="4.0.1.79" />
   </ItemGroup>
 
@@ -66,7 +66,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">    
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />      
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.1" />      
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' Or '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">

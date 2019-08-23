@@ -8,8 +8,7 @@ namespace Ruzzie.FuzzyStrings
     public static class StringExtensions
     {
         private static readonly IFixedSizeCache<string, double> Cache =
-            new FlashCache<string, double>(InternalVariables.MaxCacheSizeInMb, InternalVariables.StringComparerForCacheKey,
-                InternalVariables.AverageStringSizeInBytes);
+            new FlashCacheWithPool<string, double>(InternalVariables.StringComparerForCacheKey, (InternalVariables.MaxCacheSizeInMb * 1024 * 1024) / InternalVariables.AverageStringSizeInBytes);
 
         private const string Space = " ";
         public const double ExactMatchProbability = 0.99999899999999997d;
