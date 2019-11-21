@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using Ruzzie.Caching;
 
 namespace Ruzzie.FuzzyStrings
@@ -13,11 +12,6 @@ namespace Ruzzie.FuzzyStrings
         private const string Space = " ";
         public const double ExactMatchProbability = 0.99999899999999997d;
         public const double FuzzyMatchMaxProbability = 0.99998899999999997d;
-#if !PORTABLE && HAVE_REGEXCOMPILEDOPTION
-        private static readonly Regex StripRegex = new Regex(@"[^a-zA-Z0-9 -]*", RegexOptions.Compiled);
-#else
-         private static readonly Regex StripRegex = new Regex(@"[^a-zA-Z0-9 -]*");
-#endif
 
         public static bool FuzzyEquals(this string strA, string strB, double requiredProbabilityScore = 0.75, bool caseSensitive = true)
         {
@@ -177,7 +171,7 @@ namespace Ruzzie.FuzzyStrings
 
                     for (int x = 0; x < partsBLength; x++)
                     {
-                        var coefficient = CompositeCoefficientAlt(partsA[i], partsB[x], caseSensitive, isAlreadyToUpper);
+                        var coefficient = CompositeCoefficient(partsA[i], partsB[x], caseSensitive, isAlreadyToUpper);
                         if (coefficient > high)
                         {
                             high = coefficient;
@@ -195,13 +189,8 @@ namespace Ruzzie.FuzzyStrings
                     : FuzzyMatchMaxProbability; //fudge factor
             }
 
-            var singleComposite = CompositeCoefficientAlt(localA, localB, caseSensitive, isAlreadyToUpper);
+            var singleComposite = CompositeCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
             return singleComposite < 0.999999 ? singleComposite : FuzzyMatchMaxProbability; //fudge factor
-        }
-
-        public static string StripWithRegex(string str)
-        {            
-            return StripRegex.Replace(str, string.Empty);
         }
 
         /// <summary>
@@ -299,7 +288,7 @@ namespace Ruzzie.FuzzyStrings
                             return false;
                         }
 
-                        var hasStringAt = DoubleMetaphoneExtensionsAlt.StringAt(strAPtr, aLength, i, strBPtr, bLength);
+                        var hasStringAt = DoubleMetaphoneExtensions.StringAt(strAPtr, aLength, i, strBPtr, bLength);
                         if (hasStringAt)
                         {
                             return true;
@@ -322,39 +311,6 @@ namespace Ruzzie.FuzzyStrings
             bool isAlreadyToUpper = false)
         {
             double dice = strA.DiceCoefficient(strB);
-            var lcs = strA.LongestCommonSubsequence(strB, caseSensitive, false);
-            double levenCoefficient = CalculateLevenshteinDistanceCoefficientForCompositeCoefficient(strA, strB, caseSensitive);//may want to tweak offset
-
-            int matchCount = 0;
-            if (strA.Length > 4 && strB.Length > 4)
-            {
-                var strAMp = strA.ToDoubleMetaphone(isAlreadyToUpper);
-                var strBMp = strB.ToDoubleMetaphone(isAlreadyToUpper);
-                int strAMpLength = strAMp.Length;
-                if (strAMpLength == 4 && strAMpLength == strBMp.Length)
-                {
-                    for (int i = 0; i < strAMpLength; i++)
-                    {
-                        if (strAMp[i] == strBMp[i])
-                        {
-                            ++matchCount;
-                        }
-                    }
-                }
-            }
-
-            double mpCoefficient = matchCount == 0 ? 0.0 : matchCount / 4.0;
-            double avgCoefficient = (dice + lcs.Coefficient + levenCoefficient + mpCoefficient) / 4.0;
-            return avgCoefficient;
-        }
-
-        public static double CompositeCoefficientAlt(
-            string strA,
-            string strB,
-            bool caseSensitive = true,
-            bool isAlreadyToUpper = false)
-        {
-            double dice = strA.DiceCoefficient(strB);
             var lcs = strA.LongestCommonSubsequence(strB, caseSensitive, false, isAlreadyToUpper);
             double levenCoefficient = CalculateLevenshteinDistanceCoefficientForCompositeCoefficient(strA, strB, caseSensitive, isAlreadyToUpper);//may want to tweak offset
 
@@ -366,8 +322,8 @@ namespace Ruzzie.FuzzyStrings
                     char* strAMp = stackalloc char[4];
                     char* strBMp = stackalloc char[4];
 
-                    strA.ToDoubleMetaphoneAlt(isAlreadyToUpper, strAMp, out int strAMpLength);
-                    strB.ToDoubleMetaphoneAlt(isAlreadyToUpper, strBMp, out int strBMpLength);
+                    strA.ToDoubleMetaphone(isAlreadyToUpper, strAMp, out int strAMpLength);
+                    strB.ToDoubleMetaphone(isAlreadyToUpper, strBMp, out int strBMpLength);
                     
                     if (strAMpLength == 4 && strAMpLength == strBMpLength)
                     {
@@ -380,9 +336,6 @@ namespace Ruzzie.FuzzyStrings
                         }
                     }
                 }
-                //var strAMp = strA.ToDoubleMetaphoneAlt(isAlreadyToUpper);
-                //var strBMp = strB.ToDoubleMetaphoneAlt(isAlreadyToUpper);
-                //int strAMpLength = strAMp.Length;
             }
 
             double mpCoefficient = matchCount == 0 ? 0.0 : matchCount / 4.0;

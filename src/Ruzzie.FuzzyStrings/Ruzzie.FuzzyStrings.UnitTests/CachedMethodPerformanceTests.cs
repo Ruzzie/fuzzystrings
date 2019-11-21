@@ -146,30 +146,6 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         }
 
         [Test]
-        public void StripAlternativeTests()
-        {
-            Random random = new Random();
-
-            string sourceString = "Beast-of-Burden's power and toughness  are each equal to the number of creatures on the battlefield.";
-
-            //warmup
-            StringExtensions.StripWithRegex(sourceString + random.Next());
-            StringExtensions.StripAlternative(sourceString + random.Next());
-
-            //classic replace method with tolowercase
-            Func<string> regexStrip = () => StringExtensions.StripWithRegex(sourceString + random.Next());
-
-            Func<string> customStrip = () => StringExtensions.StripAlternative(sourceString + random.Next());
-
-            var numberOfTimesToExecute = 10000;
-            TimeSpan regexStripTiming = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, regexStrip);
-            TimeSpan alternativeStripTiming = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, customStrip);
-
-            Console.WriteLine("Regex timing:  " + regexStripTiming.TotalMilliseconds);
-            Console.WriteLine("Custom timing: " + alternativeStripTiming.TotalMilliseconds);
-        }
-
-        [Test]
         public void StripAlternativeV2Tests()
         {
             Random random = new Random();

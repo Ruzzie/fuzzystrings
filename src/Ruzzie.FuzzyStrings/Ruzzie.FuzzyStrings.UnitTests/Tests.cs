@@ -137,13 +137,33 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("{G}", "B", 1, false)]
         [TestCase("", "B", 0, false)]
         [TestCase("", "", 0, true)]
-        //[TestCase("A string original", "original", 0, false)] // this differs with the original implementation (which i consider a bug)
+        //[TestCase("A string original", "original", 0, false)] //NOTE: this differs with the original implementation (which i consider a bug)
         [TestCase("very much", "very much longer and longer", 0, false)]
         [TestCase("very much longer", "very much longer and longer", 5, false)]
         public void StringAtOneParamTests(string input, string stringAt, int atIndex, bool expectedResult)
         {
             Assert.That(DoubleMetaphoneExtensions.StringAt(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAt");
-            //Assert.That(DoubleMetaphoneExtensions.StringAtOrig(input, atIndex, stringAt), Is.EqualTo(expectedResult), "StringAtOrig");
+            Assert.That(DoubleMetaphoneExtensions.StringAtOld(input, atIndex, stringAt, stringAt), Is.EqualTo(expectedResult), "StringAtBoth");
+        }
+
+        [TestCase("{B}{G}", "B", "", 1, true)]
+        [TestCase("{G}", "G", "", 1, true)]
+        [TestCase("{G}", "B", "", 1, false)]
+        [TestCase("", "B", "", 0, true)]
+        [TestCase("", "", "", 0, true)]
+        [TestCase("very much", "very much longer and longer", "", 0, false)]
+        [TestCase("very much longer", "very much longer and longer", "", 5, false)]
+        [TestCase("POBOX", "B", "P", 1, false)]
+        [TestCase("POBOX", "B", "P", 2, true)]
+        [TestCase("POBOX", "WR", "PS", 0, false)]
+        [TestCase("PSORELLO", "WR", "PS", 0, true)]
+        public void StringAtTwoParamTests(string input, string stringAt, string stringAtB, int atIndex, bool expectedResult)
+        {
+            Assert.That(DoubleMetaphoneExtensions.StringAtOld(input, atIndex, stringAt, stringAtB), Is.EqualTo(expectedResult), "StringAltAtLeft");
+            Assert.That(DoubleMetaphoneExtensions.StringAtOld(input, atIndex, stringAtB, stringAt), Is.EqualTo(expectedResult), "StringAltAtRight");
+
+            Assert.That(DoubleMetaphoneExtensions.StringAt(input, atIndex, stringAt, stringAtB), Is.EqualTo(expectedResult), "StringAtLeft");
+            Assert.That(DoubleMetaphoneExtensions.StringAt(input, atIndex, stringAtB, stringAt), Is.EqualTo(expectedResult), "StringAtRight");
         }
 
         [TestCase("Jensn", "ANSN")]
@@ -178,20 +198,22 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("Psollero", "SLR")]
         [TestCase("Honorificabilitudinitatibus", "HNRF")]
         [TestCase("SCH", "S")]
+        [TestCase("breaux", "PR")]
+        [TestCase("BOX", "PKS")]
+        [TestCase("PO B", "PP")]
         public void ToDoubleMetaPhoneTests(string input, string expected)
         {
-            Assert.That(input.ToDoubleMetaphone(), Is.EqualTo(expected));
-            Assert.That(DoubleMetaphoneExtensionsAlt.ToDoubleMetaphoneAlt(input,false), Is.EqualTo(expected));
+            Assert.That(DoubleMetaphoneExtensions.ToDoubleMetaphoneStr(input,false), Is.EqualTo(expected));
         }
 
         [TestCase("Spotify","Spotfy","Sputfi", "Spotifi")]
         [TestCase( "United Air Lines", "United Aire Lines", "Unitid Air Line")]
         public void ToDoubleMetaPhoneSimilarTests(params string[] resultsInSame)
         {
-            var previous = resultsInSame[0].ToDoubleMetaphoneUncached();
+            var previous = resultsInSame[0].ToDoubleMetaphone();
             for (int i = 1; i < resultsInSame.Length; i++)
             {
-                var current = resultsInSame[i].ToDoubleMetaphoneUncached();
+                var current = resultsInSame[i].ToDoubleMetaphone();
                 Assert.That(current, Is.EqualTo(previous));
                 previous = current;
             }
