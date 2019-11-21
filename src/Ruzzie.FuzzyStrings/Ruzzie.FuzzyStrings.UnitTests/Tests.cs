@@ -60,7 +60,6 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void DiceCoefficientTests(string input, string compareTo, double expected)
         {
             Assert.That(input.DiceCoefficient(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
-            Assert.That(input.DiceCoefficientAlternative(compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
             Assert.That( DiceCoefficientExtensions.DiceCoefficientAlternativeV2(input, compareTo), Is.EqualTo(expected).Within(0.0000000000000009));
         }
 
@@ -86,7 +85,6 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void LevenshteinTests(string input, string compareTo, int expected)
         {
             Assert.That(input.LevenshteinDistance(compareTo), Is.EqualTo(expected));
-            Assert.That(input.LevenshteinDistanceUncachedAlternative(compareTo), Is.EqualTo(expected), "LevenshteinDistanceUncachedAlternative");
             Assert.That(input.LevenshteinDistanceUncachedAlternativeV2(compareTo), Is.EqualTo(expected),"LevenshteinDistanceUncachedAlternativeV2");
         }
 

@@ -70,34 +70,6 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         }
 
         [Test]
-        public void LevenshteinDistanceAlternativeTest()
-        {
-            Random random = new Random(1337);
-
-            int next = random.Next();
-            string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures" + next;//.ToLowerInvariant();
-            string stringToFind = "to the number of creatures" + next;
-
-            //classic replace method with tolowercase
-            Func<int> original = () => (sourceString + next).LevenshteinDistanceUncachedAlternative(stringToFind + next);
-
-            Func<int> alternative = () => (sourceString + next).LevenshteinDistanceUncachedAlternativeV2(stringToFind + next);
-
-            var numberOfTimesToExecute = 1000;
-
-            //warmup
-            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(250, alternative);
-            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(250, original);
-
-            //execute
-            alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
-            originalTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, original);
-
-            Console.WriteLine("Original timing: " + originalTimings.TotalMilliseconds);
-            Console.WriteLine("Alternative timing: " + alternativeTimings.TotalMilliseconds);
-        }
-
-        [Test]
         public void LongestCommonSubsequenceAlternativeWithoutBacktrackingTest()
         {
             Random random = new Random(1337);
@@ -264,34 +236,6 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Console.WriteLine("stringbuilder timing: " + stringBuilderTiming.TotalMilliseconds);
             Console.WriteLine("join          timing: " + joinTiming.TotalMilliseconds);
         }
-
-        [Test]
-        public void DiceCoefficientAlternativeTest()
-        {
-            Random random = new Random(37);
-
-            int next = random.Next();
-            string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures" + next;
-            string stringToFind = "Predominantly sedentary, the species and creatures can be locally nomadic." + next;
-
-            Func<double> original = () => (sourceString + random.Next()).DiceCoefficientAlternative(stringToFind + random.Next());
-
-            Func<double> alternative = () => (sourceString + random.Next()) .DiceCoefficientAlternativeV2(stringToFind + random.Next());
-
-            var numberOfTimesToExecute = 10000;
-
-            //warmup
-            TimeSpan alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute /2, alternative);
-            TimeSpan originalTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute /2, original);
-
-            //execute
-            alternativeTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, alternative);
-            originalTimings = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, original);
-
-
-            Console.WriteLine("Original timing: " + originalTimings.TotalMilliseconds);
-            Console.WriteLine("Alternative timing: " + alternativeTimings.TotalMilliseconds);
-        }      
 
         [Test]
         public void StringAlternativeToUpperInsteadOfToLower()

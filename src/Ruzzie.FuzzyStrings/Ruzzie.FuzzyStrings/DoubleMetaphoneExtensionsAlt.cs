@@ -235,33 +235,6 @@ namespace Ruzzie.FuzzyStrings
                 return new string(Primary, 0, Math.Min(4, PrimaryIndex));
             }
 
-            public char[] ToCharArray()
-            {
-                //only give back 4 char metaph
-                if (_alternative)
-                {
-                    var secondaryLength = Math.Min(4, SecondaryIndex);
-                    char[] secondaryResult = new char[secondaryLength];
-
-                    for (int i = 0; i < secondaryLength; i++)
-                    {
-                        secondaryResult[i] = Secondary[i];
-                    }
-                   
-                    return secondaryResult;
-                }
-
-                var length = Math.Min(4, PrimaryIndex);
-                char[] result = new char[length];
-               
-                for (int i = 0; i < length; i++)
-                {
-                    result[i] = Primary[i];
-                }
-               
-                return result;
-            }
-
             public void CopyTo(char* buffer, out int length)
             {
                 if (_alternative)
@@ -1390,11 +1363,6 @@ namespace Ruzzie.FuzzyStrings
         public static bool StringAtOld(this string self, int startIndex, string a, string b)
         {
             return StringAt(self, startIndex, a) || StringAt(self, startIndex, b);
-        }
-
-        static bool StringAtOld(this string self, int startIndex, string a, string b, string c)
-        {
-            return StringAt(self, startIndex, a, b)  || StringAt(self, startIndex, c);
         }
 
         static bool StringAt(this string self, int startIndex, string a, string b, string c, string d)

@@ -253,26 +253,6 @@ namespace Ruzzie.FuzzyStrings
         private LcsTrack _trueValue;
         private LcsTrack _falseValue;
 
-        //public LcsTrack this[bool index]
-        //{
-        //    get
-        //    {
-        //        return index ? _trueValue : _falseValue;
-        //    }
-
-        //    set
-        //    {
-        //        if (index)
-        //        {
-        //            _trueValue = value;
-        //        }
-        //        else
-        //        {
-        //            _falseValue = value;
-        //        }
-        //    }
-        //}
-
 #if HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
