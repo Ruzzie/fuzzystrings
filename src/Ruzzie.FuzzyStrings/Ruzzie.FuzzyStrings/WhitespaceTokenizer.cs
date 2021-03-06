@@ -7,7 +7,7 @@ namespace Ruzzie.FuzzyStrings
         private static readonly char[] SplitChars = null!;
         public string[] Tokenize(string input)
         {
-            return input.Split(SplitChars,StringSplitOptions.RemoveEmptyEntries);
+            return input.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

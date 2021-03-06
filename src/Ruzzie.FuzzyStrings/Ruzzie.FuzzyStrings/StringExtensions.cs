@@ -9,7 +9,6 @@ namespace Ruzzie.FuzzyStrings
         private static readonly IFixedSizeCache<string, double> Cache =
             new FlashCacheWithPool<string, double>(InternalVariables.StringComparerForCacheKey, (InternalVariables.MaxCacheSizeInMb * 1024 * 1024) / InternalVariables.AverageStringSizeInBytes);
 
-        private const string Space = " ";
         public const double ExactMatchProbability = 0.99999899999999997d;
         public const double FuzzyMatchMaxProbability = 0.99998899999999997d;
 
@@ -129,7 +128,7 @@ namespace Ruzzie.FuzzyStrings
             string localB = StripAlternativeV2(strB.Trim());
             bool isAlreadyToUpper = false;
             if (!caseSensitive)
-            {                
+            {
                 if (string.Equals(localA, localB, StringComparison.OrdinalIgnoreCase))
                 {
                     return ExactMatchProbability;
@@ -140,7 +139,7 @@ namespace Ruzzie.FuzzyStrings
                 isAlreadyToUpper = true;
             }
             else
-            {              
+            {
                 if (string.Equals(localA, localB, StringComparison.Ordinal))
                 {
                     return ExactMatchProbability;
@@ -149,19 +148,21 @@ namespace Ruzzie.FuzzyStrings
 
             return AvgWeightedHighCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
         }
-        static readonly char[] Separator =  {' '};
+
+        static readonly char SpaceSeparator =  ' ';
         private static double AvgWeightedHighCoefficient(
             string localA,
             string localB,
             bool caseSensitive,
             bool isAlreadyToUpper)
         {
-            if (localA.ContainsString(Space) && localB.ContainsString(Space))
+            var partsA       = localA.Split(SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
+            var partsB       = localB.Split(SpaceSeparator, StringSplitOptions.RemoveEmptyEntries);
+            int partsALength = partsA.Length;
+            int partsBLength = partsB.Length;
+
+            if (partsALength > 1 && partsBLength > 1)
             {
-                var partsA = localA.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
-                var partsB = localB.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
-                int partsALength = partsA.Length;
-                int partsBLength = partsB.Length;
                 double weightedHighCoefficientsSum = 0;
 
                 for (int i = 0; i < partsALength; i++)
@@ -202,7 +203,7 @@ namespace Ruzzie.FuzzyStrings
         {
             int length = str.Length;
             StringBuilder b = new StringBuilder(length);
-            
+
             for (int i = 0; i < length; ++i)
             {
                 char c = str[i];
@@ -224,8 +225,8 @@ namespace Ruzzie.FuzzyStrings
                 // ReSharper restore RedundantCast
             }
             return b.ToString();
-        }     
-        
+        }
+
         /// <summary>
         /// Strips string of characters that are not [^a-zA-Z0-9 -]*
         /// </summary>
@@ -234,74 +235,55 @@ namespace Ruzzie.FuzzyStrings
         public static string StripAlternativeV2(string str)
         {
             int length = str?.Length ?? 0;
-           
-            if(length == 0)
+
+            if (length == 0 || str == null)
             {
                 return string.Empty;
             }
 
-            unsafe
+            int        appendIndex = 0;
+            Span<char> buffer      = stackalloc char[length];
+
+            for (int i = 0; i < length; ++i)
             {
-                int appendIndex = 0;
-                char* buffer = stackalloc char[length];
-
-                for (int i = 0; i < length; ++i)
+                char c = str[i];
+                // ReSharper disable RedundantCast
+                if (97 <= (int) c && (int) c <= 122) //a-z
                 {
-                    char c = str[i];
-                    // ReSharper disable RedundantCast
-                    if (97 <= (int) c && (int) c <= 122)//a-z
-                    {
-                        buffer[appendIndex] = c;
-                        appendIndex++;
-                    } else if (65 <= (int) c && (int) c <= 90) //A-Z
-                    {
-                        buffer[appendIndex] = c;
-                        appendIndex++;
-                    } else if (48 <= (int) c && (int) c <= 57) //0-9
-                    {
-                        buffer[appendIndex] = c;
-                        appendIndex++;
-                    }
-                    else if (32 == (int) c || 45 == (int)c)//space, -
-                    {
-                        buffer[appendIndex] = c;
-                        appendIndex++;
-                    }
-                    // ReSharper restore RedundantCast
+                    buffer[appendIndex] = c;
+                    appendIndex++;
                 }
-                return new string(buffer, 0, appendIndex);
-            }
-        }  
-
-        public static bool ContainsString(this string input, string stringToFind)
-        {
-            unsafe
-            {
-                int aLength = input.Length;
-                int bLength = stringToFind.Length;
-                fixed (char* strAPtr = input, strBPtr = stringToFind)
+                else if (65 <= (int) c && (int) c <= 90) //A-Z
                 {
-                    for (int i = 0; i < aLength; i++)
-                    {
-                        if (bLength > (aLength - i))
-                        {
-                            return false;
-                        }
-
-                        var hasStringAt = DoubleMetaphoneExtensions.StringAt(strAPtr, aLength, i, strBPtr, bLength);
-                        if (hasStringAt)
-                        {
-                            return true;
-                        }
-                    }
+                    buffer[appendIndex] = c;
+                    appendIndex++;
                 }
-                return false;
+                else if (48 <= (int) c && (int) c <= 57) //0-9
+                {
+                    buffer[appendIndex] = c;
+                    appendIndex++;
+                }
+                else if (32 == (int) c || 45 == (int) c) //space, -
+                {
+                    buffer[appendIndex] = c;
+                    appendIndex++;
+                }
+                // ReSharper restore RedundantCast
             }
+
+            return new string(buffer.Slice(0, appendIndex));
         }
 
         public static bool AnyString(this string input, string stringToFind, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
-             return input.IndexOf(stringToFind,0, comparison) != -1;
+            if (comparison == StringComparison.OrdinalIgnoreCase)
+            {
+                return input.ToLowerInvariant().Contains(stringToFind.ToLowerInvariant());
+            }
+
+            return input.Contains(stringToFind, comparison);
+
+            //return input.IndexOf(stringToFind,0, comparison) != -1; //this is slower
         }
 
         public static double CompositeCoefficient(
@@ -324,7 +306,7 @@ namespace Ruzzie.FuzzyStrings
 
                     strA.ToDoubleMetaphone(isAlreadyToUpper, strAMp, out int strAMpLength);
                     strB.ToDoubleMetaphone(isAlreadyToUpper, strBMp, out int strBMpLength);
-                    
+
                     if (strAMpLength == 4 && strAMpLength == strBMpLength)
                     {
                         for (int i = 0; i < strAMpLength; i++)

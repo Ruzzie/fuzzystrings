@@ -1,5 +1,5 @@
-﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
- * Derived from http://www.codeproject.com/KB/recipes/lcs.aspx 
+﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Derived from http://www.codeproject.com/KB/recipes/lcs.aspx
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using System;
@@ -82,9 +82,8 @@ namespace Ruzzie.FuzzyStrings
             return CalculateLongestCommonSubSequence(input, inputLen, comparedToLen, tracks, coef);
         }
 
-#if !PORTABLE && HAVE_METHODINLINING
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int SquareOfValuePlusOneMinusSquareOfValue(int k)
         {
             /*Square(k + 1) - Square(k) // this can be written as 2k +1 */
@@ -182,28 +181,28 @@ namespace Ruzzie.FuzzyStrings
             {
                 fixed (char* inputPtr = input, comparedToPtr = comparedTo)
                 {
-                    // Find lengths of 
-                    // two strings 
+                    // Find lengths of
+                    // two strings
                     int m = input.Length, n = comparedTo.Length;
 
-                    BinaryLcsElement* L = stackalloc BinaryLcsElement[n + 1];
-                   
-                    // Binary index, used to  
-                    // index current row and  
-                    // previous row. 
+                    BinaryLcsElement* l = stackalloc BinaryLcsElement[n + 1];
+
+                    // Binary index, used to
+                    // index current row and
+                    // previous row.
                     bool bi = false;
 
                     for (int i = 1; i <= m; i++)
                     {
-                        // Compute current 
-                        // binary index 
+                        // Compute current
+                        // binary index
                         bi = (i & 1) == 0;
 
                         for (int j = 1; j <= n; j++)
                         {
                             int tmpLcsValue;
                             var tmpCountValue = 0;
-                            var previousDiagonal = L[j - 1].At(!bi);
+                            var previousDiagonal = l[j - 1].At(!bi);
                             if (inputPtr[i - 1] == comparedToPtr[j - 1])
                             {
                                 int k = previousDiagonal.CountValue;
@@ -215,7 +214,7 @@ namespace Ruzzie.FuzzyStrings
                                 tmpLcsValue = previousDiagonal.LcsValue;
                             }
 
-                            var newLcsValue = Math.Max(L[j].At(!bi).LcsValue, L[j - 1].At(bi).LcsValue);
+                            var newLcsValue = Math.Max(l[j].At(!bi).LcsValue, l[j - 1].At(bi).LcsValue);
 
                             if (newLcsValue >= tmpLcsValue)
                             {
@@ -223,47 +222,35 @@ namespace Ruzzie.FuzzyStrings
                                 tmpLcsValue = newLcsValue;
                             }
 
-                            L[j].SetAt(bi, new LcsTrack(tmpLcsValue, tmpCountValue));
+                            l[j].SetAt(bi, new LcsTrack(tmpLcsValue, tmpCountValue));
                         }
                     }
 
 
-                    // Last filled entry contains 
-                    // length of LCS for X[0..n-1] 
-                    // and Y[0..m-1]  
+                    // Last filled entry contains
+                    // length of LCS for X[0..n-1]
+                    // and Y[0..m-1]
                     //double p = L[bi, n].LcsValue;
-                    double p = L[n].At(bi).LcsValue;
+                    double p = l[n].At(bi).LcsValue;
                     double coef = p / (m * n);
                     return new LongestCommonSubsequenceResult(coef);
                 }
             }
         }
-#if HAVE_METHODINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static int Max(int a, int b, int c)
-        {
-            return Math.Max(a, Math.Max(b, c));
-        }
     }
-
 
     internal struct BinaryLcsElement
     {
         private LcsTrack _trueValue;
         private LcsTrack _falseValue;
 
-#if HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public LcsTrack At(bool index)
         {
             return index ? _trueValue : _falseValue;
         }
 
-#if HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void SetAt(bool index, in LcsTrack value)
         {
             if (index)
@@ -297,7 +284,7 @@ namespace Ruzzie.FuzzyStrings
         NorthWest = 8
     }
 
-    public struct LongestCommonSubsequenceResult
+    public readonly struct LongestCommonSubsequenceResult
     {
         public LongestCommonSubsequenceResult(string longestSubsequence, double coefficient) : this()
         {

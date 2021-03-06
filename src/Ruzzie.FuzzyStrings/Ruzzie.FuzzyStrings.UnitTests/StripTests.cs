@@ -7,8 +7,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
     {
         [TestCase("Doctor Who!", "Doctor Who")]
         [TestCase(" Flashback {4}{R}", " Flashback 4R")]
-        [TestCase(" Æther Vial", " ther Vial")]
-        [TestCase(" Æther Vial-", " ther Vial-")]
+        [TestCase(" Ã†ther Vial", " ther Vial")]
+        [TestCase(" Ã†ther Vial-", " ther Vial-")]
         public void SmokeTest(string input, string expected)
         {
             Assert.That(StringExtensions.StripAlternative(input), Is.EqualTo(expected));
@@ -28,7 +28,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase(1,0,-1,-1)]
         [TestCase(1,1,1,1)]
         public void FindMinimumOptimized(int a, int b, int c, int expected)
-        {            
+        {
             Assert.That(LevenshteinDistanceExtensions.Min(a,b,c), Is.EqualTo(expected));
         }
     }

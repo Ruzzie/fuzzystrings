@@ -29,7 +29,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("kjeldoran elite guard master", "kjeldoran elite guard",  0.55814012072314667d)]
         [TestCase("Grizzled Angler", "Tangle Angler", 0.73445802805706839d)]
         [TestCase("", "",StringExtensions.ExactMatchProbability)]
-        [TestCase("\t\n", "   ", StringExtensions.ExactMatchProbability)]        
+        [TestCase("\t\n", "   ", StringExtensions.ExactMatchProbability)]
         public void TokenizeFuzzyMatch(string input, string compareTo, double expected)
         {
             Assert.That(input.FuzzyMatchTokens(compareTo, false), Is.EqualTo(expected));
@@ -389,8 +389,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         public void CalculateLevenCoefficient(string input, string compareTo, double expected)
         {
             Assert.That(StringExtensions.CalculateLevenshteinDistanceCoefficientForCompositeCoefficient(input,compareTo),Is.EqualTo(expected));
-        }      
-        
+        }
+
         [Theory]
         [TestCase("kitten", "sitting", 3)]
         [TestCase("78135", "75130", 2)]
@@ -417,9 +417,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("deals 3 damage to target creature or player.",
             "to target creature or player.",
             true)]
+        [Ignore("No alternative contains algorithm. enable to test")]
         public void StringContainsTest(string a, string b, bool expectedResult)
         {
-            Assert.That(a.ContainsString(b), Is.EqualTo(expectedResult));
+            //TODO: Change this to alternative Algorithm when needed
+            Assert.That(a.Contains(b), Is.EqualTo(expectedResult));
         }
     }
 }

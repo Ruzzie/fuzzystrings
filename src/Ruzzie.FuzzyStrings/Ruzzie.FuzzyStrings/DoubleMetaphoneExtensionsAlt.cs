@@ -15,7 +15,7 @@ namespace Ruzzie.FuzzyStrings
     {
         public static string ToDoubleMetaphoneStr(this string input, bool isAlreadyToUpper = false)
         {
-            return  new string(input.ToDoubleMetaphone(isAlreadyToUpper));
+            return new string(input.ToDoubleMetaphone(isAlreadyToUpper));
         }
 
         public static char[] ToDoubleMetaphone(this string input, bool isAlreadyToUpper = false)
@@ -57,12 +57,12 @@ namespace Ruzzie.FuzzyStrings
 
             int current = 0;
 
-            
+
             if (!isAlreadyToUpper)
             {
                 input = Common.Hashing.InvariantUpperCaseStringExtensions.ToUpperInvariant(input);
             }
-            
+
             bool isSlavoGermanic;
 
             fixed (char* ptr = input)
@@ -103,9 +103,8 @@ namespace Ruzzie.FuzzyStrings
             metaphoneData.CopyTo(metaphoneBuffer, out metaphoneBufferLength);
         }
 
-#if !PORTABLE && HAVE_METHODINLINING
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         static char CharAtOrReturnSpaceWhenOutOfRange(in string value, int index)
         {
             if (index < value.Length)
@@ -279,7 +278,7 @@ namespace Ruzzie.FuzzyStrings
                     //"-mb", e.g", "dumb", already skipped over...
                     metaphoneData.Add('P');
 
-                    
+
                     if (CharAtOrReturnSpaceWhenOutOfRange(workingString, current + 1) == charB)
                     {
                         current += 2;
@@ -362,7 +361,7 @@ namespace Ruzzie.FuzzyStrings
                     //obvious spanish, 'jose', 'san jacinto'
                     if (StringAt(workingString, current, strJOSE) || StringAt(workingString, 0, strSANsp))
                     {
-                        if (((current == 0) && (CharAtOrReturnSpaceWhenOutOfRange(workingString, current + 4) == ' ')) || StringAt(workingString, 0, strSANsp))
+                        if (((current == 0) && (CharAtOrReturnSpaceWhenOutOfRange(workingString,  4) == ' ')) || StringAt(workingString, 0, strSANsp))
                         {
                             metaphoneData.Add(charH);
                         }
@@ -596,11 +595,11 @@ namespace Ruzzie.FuzzyStrings
                         break;
                     }
 
-                    if ((current == 0) && (IsVowel(CharAtOrReturnSpaceWhenOutOfRange(workingString, current + 1))
+                    if ((current == 0) && (IsVowel(CharAtOrReturnSpaceWhenOutOfRange(workingString,  1))
                                            || StringAt(workingString, current, strWH)))
                     {
                         //Wasserman should match Vasserman
-                        if (IsVowel(CharAtOrReturnSpaceWhenOutOfRange(workingString, current + 1)))
+                        if (IsVowel(CharAtOrReturnSpaceWhenOutOfRange(workingString,  1)))
                         {
                             metaphoneData.Add(strA, strF);
                         }
@@ -737,7 +736,7 @@ namespace Ruzzie.FuzzyStrings
             //german & anglicisations, e.g. 'smith' match 'schmidt', 'snider' match 'schneider'
             //also, -sz- in slavic language altho in hungarian it is pronounced 's'
             if (((current == 0)
-                 && StringAt(workingString, (current + 1), strM, strN, strL, strW))
+                 && StringAt(workingString, 1, strM, strN, strL, strW))
                 || StringAt(workingString, (current + 1), strZ))
             {
                 metaphoneData.Add(strS, strX);
@@ -836,7 +835,7 @@ namespace Ruzzie.FuzzyStrings
                     //'ghislane', ghiradelli
                     if (current == 0)
                     {
-                        if (CharAtOrReturnSpaceWhenOutOfRange(workingString, current + 2) == charI)
+                        if (CharAtOrReturnSpaceWhenOutOfRange(workingString,  2) == charI)
                         {
                             metaphoneData.Add(charJ);
                         }
@@ -905,8 +904,8 @@ namespace Ruzzie.FuzzyStrings
 
             //-ges-,-gep-,-gel-, -gie- at beginning
             if ((current == 0)
-                && ((CharAtOrReturnSpaceWhenOutOfRange(workingString, current + 1) == charY)
-                    || StringAt(workingString, (current + 1), strES, strEP, strEB, strEL, strEY, strIB, strIL, strIN, strIE, strEI, strER)))
+                && ((CharAtOrReturnSpaceWhenOutOfRange(workingString,  1) == charY)
+                    || StringAt(workingString, 1, strES, strEP, strEB, strEL, strEY, strIB, strIL, strIN, strIE, strEI, strER)))
             {
                 metaphoneData.Add(strK, strJ);
                 current += 2;
@@ -960,7 +959,7 @@ namespace Ruzzie.FuzzyStrings
             }
             metaphoneData.Add(charK);
             return current;
-           
+
         }
 
         private static int MapCharacterC(string workingString, int current, ref MetaphoneBuffer metaphoneData)
@@ -1006,8 +1005,8 @@ namespace Ruzzie.FuzzyStrings
 
                 //greek roots e.g. 'chemistry', 'chorus'
                 if ((current == 0)
-                    && (StringAt(workingString, (current + 1), strHARAC, strHARIS)
-                        || StringAt(workingString, (current + 1), strHOR, strHYM, strHIA, strHEM))
+                    && (StringAt(workingString,  1, strHARAC, strHARIS)
+                        || StringAt(workingString,  1, strHOR, strHYM, strHIA, strHEM))
                     && !StringAt(workingString, 0, strCHORE))
                 {
                     metaphoneData.Add(charK);
@@ -1414,9 +1413,7 @@ namespace Ruzzie.FuzzyStrings
             }
         }
 
-#if !PORTABLE && HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         internal static unsafe bool StringAt(char* selfPtr, int selfLength, int startIndex, char* valuePtr, int valueLength)
         {
             if (valueLength == 0)
@@ -1437,7 +1434,7 @@ namespace Ruzzie.FuzzyStrings
             char* startSelf = selfPtr + startIndex;
             char* startValue = valuePtr;
             int pos = 0;
-                    
+
             while (pos < valueLength)
             {
                 if (*startSelf != *startValue)
@@ -1481,7 +1478,7 @@ namespace Ruzzie.FuzzyStrings
             char* startAValue = searchValues.ValueAPtr;
             char* startBValue = searchValues.ValueBPtr;
             int pos = 0;
-                
+
             var foundChar = false;
 
             while (pos < maxSearchLength)
@@ -1546,7 +1543,7 @@ namespace Ruzzie.FuzzyStrings
             char* startBValue = searchValues.ValueBPtr;
             char* startCValue = searchValues.ValueCPtr;
             int pos = 0;
-                
+
             var foundChar = false;
 
             while (pos < maxSearchLength)

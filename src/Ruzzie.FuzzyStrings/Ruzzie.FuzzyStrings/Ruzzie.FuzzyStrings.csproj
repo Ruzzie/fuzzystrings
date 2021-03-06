@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <Description>A collection of fuzzy string algorithms for .net</Description>
-    <Copyright>Copyright © Dorus Verhoeckx 2018</Copyright>
+    <Copyright>Copyright © Dorus Verhoeckx 2021</Copyright>
     <AssemblyTitle>Ruzzie.FuzzyStrings</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Dorus Verhoeckx</Authors>
-    <TargetFrameworks>net45;net451;net46;net461;net472;netstandard2.0</TargetFrameworks>
+    <Company>D Crafting</Company>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Ruzzie.FuzzyStrings</AssemblyName>
@@ -16,7 +17,7 @@
     <RepositoryUrl>git://github.com/Ruzzie/fuzzystrings</RepositoryUrl>
     <License>Apache-2.0</License>
     <!-- including PDB files in NuGet for source link because symbolsource.org does not support portable PDBs -->
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder> 
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -39,77 +40,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.0.0.118" />
-    <PackageReference Include="Ruzzie.Common" Version="4.0.1.79" />
+    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.1.0.120" />
+    <PackageReference Include="Ruzzie.Common" Version="4.2.0.85" />
   </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />  
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.2' ">
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />   
-   
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">    
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />   
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">    
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />   
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="System.Diagnostics.Process" Version="4.1.0" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />  
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">    
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.1" />      
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' Or '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">
-    <Reference Include="Microsoft.VisualBasic" />
-  </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_SERIALIZABLE;HAVE_FULL_REFLECTION;</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' Or '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">
-    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_VISUALBASIC_DEVICES;HAVE_FULL_REFLECTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO</DefineConstants>
-    <CodeAnalysisRuleSet>RuleSet.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">
-    <DefineConstants>$(DefineConstants);HAVE_BUFFER_MEMORYCOPY</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_FULL_REFLECTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
-    <DefineConstants>$(DefineConstants);HAVE_REGEXCOMPILEDOPTION;HAVE_METHODINLINING;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);HAVE_REGEXCOMPILEDOPTION;HAVE_METHODINLINING;HAVE_FILEINFO;HAVE_BUFFER_MEMORYCOPY</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.2' ">
-    <DefineConstants>$(DefineConstants);HAVE_METHODINLINING</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <DefineConstants>$(DefineConstants);HAVE_METHODINLINING</DefineConstants>
-  </PropertyGroup>
 
   <PropertyGroup>
     <DebugSymbols>true</DebugSymbols>
@@ -119,9 +52,5 @@
     <DebugType>pdbonly</DebugType>
     <DocumentationFile>Ruzzie.FuzzyStrings.xml</DocumentationFile>
   </PropertyGroup>
-
-  <!--<PropertyGroup Condition=" '$(TargetFramework)' == 'portable40-net45+sl5+win8+wp8+wpa81' ">
-    <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
-  </PropertyGroup>-->
 
 </Project>

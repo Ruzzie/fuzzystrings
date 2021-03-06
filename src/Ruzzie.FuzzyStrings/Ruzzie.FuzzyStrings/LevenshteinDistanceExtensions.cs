@@ -10,9 +10,7 @@ namespace Ruzzie.FuzzyStrings
             return LevenshteinDistanceUncachedAlternativeV2(input, comparedTo, caseSensitive, alreadyUpperCased);
         }
 
-#if HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        #endif
         public static int Min(int a, int b, int c)
         {
             return Math.Min(a, Math.Min(b, c));

@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net451;net46;net461;net472</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;</TargetFrameworks>
     <AssemblyName>Ruzzie.FuzzyStrings.UnitTests</AssemblyName>
     <PackageId>Ruzzie.FuzzyStrings.UnitTests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>    
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -17,29 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.11.0" />
-    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.0.0.118" />  
+    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.1.0.120" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0'">   
-    <PackageReference Include="NUnit3TestAdapter" Version="3.11.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />   
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' Or '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">
-    <Reference Include="Microsoft.VisualBasic" />
-  </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40' ">
-    <DefineConstants>$(DefineConstants);HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_SERIALIZABLE;HAVE_FULL_REFLECTION;</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net451' Or '$(TargetFramework)' == 'net46' Or '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472' ">
-    <DefineConstants>$(DefineConstants)HAVE_PROCESS;HAVE_REGEXCOMPILEDOPTION;HAVE_VISUALBASIC_DEVICES;HAVE_FULL_REFLECTION;HAVE_SERIALIZABLE;HAVE_METHODINLINING;HAVE_TYPEISASSIGNABLEFROM;HAVE_FILEINFO</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' Or '$(TargetFramework)' == 'net472'">
-    <DefineConstants>$(DefineConstants);HAVE_PARALLELPERFORMANCE</DefineConstants>
-  </PropertyGroup>
-  
 </Project>

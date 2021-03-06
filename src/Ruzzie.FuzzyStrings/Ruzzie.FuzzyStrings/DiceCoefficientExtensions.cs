@@ -71,9 +71,7 @@ namespace Ruzzie.FuzzyStrings
             }
         }
 
-        #if HAVE_METHODINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        #endif
         private static unsafe int GetBiGramValueAsInt(char* value, int startIndex)
         {
             //int r = value[startIndex] << 16;

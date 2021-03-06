@@ -35,11 +35,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Tuple<double, double> cachedTimings = cachedTask.Result;
 
             Task<Tuple<double, double>> uncachedTask =
-                RunTask(uncachedMethod, numberOfIterationsToPerform);                
+                RunTask(uncachedMethod, numberOfIterationsToPerform);
             Tuple<double, double> uncachedTimings = uncachedTask.Result;
 
             //now for real
-            cachedTask =  RunTask(cachedMethod, numberOfIterationsToPerform);                
+            cachedTask =  RunTask(cachedMethod, numberOfIterationsToPerform);
             cachedTimings = cachedTask.Result;
 
             uncachedTask =
@@ -52,21 +52,17 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Console.WriteLine("Cached Result:     \t Avg ticks: " + cachedTimings.Item1);
             Console.WriteLine("Uncached Result:   \t Avg ms: " + uncachedTimings.Item2);
             Console.WriteLine("Cached Result:     \t Avg ms: " + cachedTimings.Item2);
-            
+
 
             Assert.That(cachedTimings.Item1, Is.LessThan(uncachedTimings.Item1));
             Assert.That(cachedTimings.Item2, Is.LessThan(uncachedTimings.Item2));
         }
 
-        private static Task<Tuple<double, double>> RunTask(Func<string, string> cachedMethod, int numberOfIterationsToPerform)
+        private static Task<Tuple<double, double>> RunTask(Func<string, string> cachedMethod,
+                                                           int                  numberOfIterationsToPerform)
         {
-#if NET40
-            var task = new Task<Tuple<double, double>>(() => ExecuteMethodWithTimingAverageResults(cachedMethod, numberOfIterationsToPerform));
-            task.Start();
-            return task;
-#else
+
             return Task.Run(() => ExecuteMethodWithTimingAverageResults(cachedMethod, numberOfIterationsToPerform));
-#endif
         }
 
         [Test]
@@ -78,10 +74,14 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string sourceString = "Beast of Burden's power and toughness are each equal to the number of creatures" + next;//.ToLowerInvariant();
             string stringToFind = "to the number of creatures" + next;
 
-            //classic replace method with tolowercase
-            Func<LongestCommonSubsequenceResult> original =() => (sourceString + next).LongestCommonSubsequenceUncached(stringToFind + next,true,false);
 
-            Func<LongestCommonSubsequenceResult> alternative =  () => (sourceString + next).LongestCommonSubsequenceWithoutSubsequenceAlternative(stringToFind + next, true);
+            //with backtracking, included lcs in result
+            Func<LongestCommonSubsequenceResult> original = () =>
+                (sourceString + next).LongestCommonSubsequenceUncached(stringToFind + next, true, true);
+
+            //no backtracking, does not include lcs in result
+            Func<LongestCommonSubsequenceResult> alternative = () =>
+                (sourceString + next).LongestCommonSubsequenceWithoutSubsequenceAlternative(stringToFind + next, true);
 
             var numberOfTimesToExecute = 1000;
 
@@ -97,7 +97,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Console.WriteLine("Alternative timing: " + alternativeTimings.TotalMilliseconds);
         }
 
-        [Test]
+        [Test][Ignore("Enable for testing custom algorithm")]
         public void StringContainsAlternativeTest()
         {
             Random random = new Random();
@@ -108,13 +108,14 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             //classic replace method with tolowercase
             Func<bool> classicContains = () => sourceString.Contains(stringToFind + random.Next());
 
-            Func<bool> alternativereplace = () => sourceString.ContainsString(stringToFind + random.Next());
+            //note: when we find an alternative algo, we can test it here
+            //Func<bool> alternativereplace = () => sourceString.ContainsString(stringToFind + random.Next());
 
             TimeSpan classicTimings = ExecuteMethodAndReturnTimings(100000, classicContains);
-            TimeSpan alternativereplaceTimings = ExecuteMethodAndReturnTimings(100000, alternativereplace);
+            //TimeSpan alternativereplaceTimings = ExecuteMethodAndReturnTimings(100000, alternativereplace);
 
             Console.WriteLine("Classic timing: " + classicTimings.TotalMilliseconds);
-            Console.WriteLine("Alternative timing: " + alternativereplaceTimings.TotalMilliseconds);
+            //Console.WriteLine("Alternative timing: " + alternativereplaceTimings.TotalMilliseconds);
         }
 
         [Test]
@@ -157,7 +158,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             Console.WriteLine("Classic timing: " + classicTimings.TotalMilliseconds);
             Console.WriteLine("Alternative timing: " + alternativereplaceTimings.TotalMilliseconds);
-        }      
+        }
 
         private static Tuple<double, double> ExecuteMethodWithTimingAverageResults(Func<string, string> methodToExecute, int numberOfIterationsToPerform)
         {
@@ -174,11 +175,11 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         }
 
         private static Stopwatch ExecuteMethodWithTimingInLoop(Func<string, string> functionToExecute, int numberOfIterationsToPerform)
-        {         
+        {
             List<string> sameRandomWordsList = new List<string>();
             Random random = new Random(numberOfIterationsToPerform);
             for (int i = 0; i < numberOfIterationsToPerform; i++)
-            {              
+            {
                 var word = string.Concat(Enumerable.Repeat("AE IOU UOIEA When enchanted creature dies, return that card to the battlefield under its owner's control.", 105).Select(s =>
                 {
                     int next = random.Next('A', 'Z' + 1);
@@ -194,7 +195,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             ParallelOptions options = new ParallelOptions {MaxDegreeOfParallelism = 4};
             Parallel.For(0, numberOfIterationsToPerform,options, j =>
             {
-                
+
                 string word = sameRandomWordsList[j];
                // Debug.WriteLine(word);
                 functionToExecute.Invoke(word);
@@ -202,8 +203,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
 
             timer.Stop();
             return timer;
-        }        
-                    
+        }
+
         [Test]
         public void StringBuilderForCacheKeyTests()
         {
@@ -213,7 +214,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string comparedTo = "Whenever a creature dealt damage by this turn dies, you gain life equal to that creature's toughness.";
             int sbLen = input.Length + comparedTo.Length + 50;
 
-         
+
             Func<string> concat = () => string.Concat(input+random.Next(), comparedTo+random.Next(), random.Next() % 2 == 0 ? "1" : "0");
 
             Func<string> join = () => string.Join("_",input + random.Next(), comparedTo + random.Next(), random.Next() % 2 == 0 ? "1" : "0");
@@ -243,7 +244,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             Random random = new Random(13);
             string one = "The Doctor";
             // ReSharper disable AccessToModifiedClosure
-            Func<string> toLower = () => (one + random.Next()).ToLower();            
+            Func<string> toLower = () => (one + random.Next()).ToLower();
             Func<string> toUpperInvariant = () =>  (one + random.Next()).ToUpperInvariant();
             // ReSharper restore AccessToModifiedClosure
 
