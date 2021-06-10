@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Ruzzie.Caching;
 
 namespace Ruzzie.FuzzyStrings
@@ -111,8 +110,8 @@ namespace Ruzzie.FuzzyStrings
         /// <remarks>This only works if the caller has already upperCased the strings</remarks>
         public static double FuzzyMatchAlreadyUpperCasedStringsUncached(this string strAUpperCase, string strBUppercase)
         {
-            string localA = StripAlternativeV2(strAUpperCase.Trim());
-            string localB = StripAlternativeV2(strBUppercase.Trim());
+            string localA = Common.StringExtensions.StripAlternative(strAUpperCase.Trim());
+            string localB = Common.StringExtensions.StripAlternative(strBUppercase.Trim());
 
             if (string.Equals(localA, localB, StringComparison.Ordinal))
             {
@@ -124,9 +123,9 @@ namespace Ruzzie.FuzzyStrings
 
         public static double FuzzyMatchUncached(this string strA, string strB, bool caseSensitive = true)
         {
-            string localA = StripAlternativeV2(strA.Trim());
-            string localB = StripAlternativeV2(strB.Trim());
-            bool isAlreadyToUpper = false;
+            string localA           = Common.StringExtensions.StripAlternative(strA.Trim());
+            string localB           = Common.StringExtensions.StripAlternative(strB.Trim());
+            bool   isAlreadyToUpper = false;
             if (!caseSensitive)
             {
                 if (string.Equals(localA, localB, StringComparison.OrdinalIgnoreCase))
@@ -149,7 +148,7 @@ namespace Ruzzie.FuzzyStrings
             return AvgWeightedHighCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
         }
 
-        static readonly char SpaceSeparator =  ' ';
+        private const char SpaceSeparator =  ' ';
         private static double AvgWeightedHighCoefficient(
             string localA,
             string localB,
@@ -194,84 +193,16 @@ namespace Ruzzie.FuzzyStrings
             return singleComposite < 0.999999 ? singleComposite : FuzzyMatchMaxProbability; //fudge factor
         }
 
-        /// <summary>
-        /// Strips string of characters that are not [^a-zA-Z0-9 -]*
-        /// </summary>
-        /// <param name="str">The string to strip</param>
-        /// <returns>The stripped string</returns>
-        public static string StripAlternative(string str)
-        {
-            int length = str.Length;
-            StringBuilder b = new StringBuilder(length);
-
-            for (int i = 0; i < length; ++i)
-            {
-                char c = str[i];
-                // ReSharper disable RedundantCast
-                if (97 <= (int) c && (int) c <= 122)//a-z
-                {
-                    b.Append(c);
-                } else if (65 <= (int) c && (int) c <= 90) //A-Z
-                {
-                    b.Append(c);
-                } else if (48 <= (int) c && (int) c <= 57) //0-9
-                {
-                    b.Append(c);
-                }
-                else if (32 == (int) c || 45 == (int)c)//space, -
-                {
-                    b.Append(c);
-                }
-                // ReSharper restore RedundantCast
-            }
-            return b.ToString();
-        }
 
         /// <summary>
         /// Strips string of characters that are not [^a-zA-Z0-9 -]*
         /// </summary>
         /// <param name="str">The string to strip</param>
         /// <returns>The stripped string</returns>
-        public static string StripAlternativeV2(string str)
+        [Obsolete("Please use Ruzzie.Common.StringExtensions.StripAlternative. This method is moved to that library.", true)]
+        public static string StripAlternative(ReadOnlySpan<char> str)
         {
-            int length = str?.Length ?? 0;
-
-            if (length == 0 || str == null)
-            {
-                return string.Empty;
-            }
-
-            int        appendIndex = 0;
-            Span<char> buffer      = stackalloc char[length];
-
-            for (int i = 0; i < length; ++i)
-            {
-                char c = str[i];
-                // ReSharper disable RedundantCast
-                if (97 <= (int) c && (int) c <= 122) //a-z
-                {
-                    buffer[appendIndex] = c;
-                    appendIndex++;
-                }
-                else if (65 <= (int) c && (int) c <= 90) //A-Z
-                {
-                    buffer[appendIndex] = c;
-                    appendIndex++;
-                }
-                else if (48 <= (int) c && (int) c <= 57) //0-9
-                {
-                    buffer[appendIndex] = c;
-                    appendIndex++;
-                }
-                else if (32 == (int) c || 45 == (int) c) //space, -
-                {
-                    buffer[appendIndex] = c;
-                    appendIndex++;
-                }
-                // ReSharper restore RedundantCast
-            }
-
-            return new string(buffer.Slice(0, appendIndex));
+            return Common.StringExtensions.StripAlternative(str);
         }
 
         public static bool AnyString(this string input, string stringToFind, StringComparison comparison = StringComparison.OrdinalIgnoreCase)

@@ -118,7 +118,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             //Console.WriteLine("Alternative timing: " + alternativereplaceTimings.TotalMilliseconds);
         }
 
-        [Test]
+        [Test][Ignore("Enable for testing custom algorithm")]
         public void StripAlternativeV2Tests()
         {
             Random random = new Random();
@@ -126,20 +126,20 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             string sourceString = "Beast-of-Burden's power and toughness  are each equal to the number of creatures on the battlefield.";
 
             //warmup
-            StringExtensions.StripAlternative(sourceString + random.Next());
-            StringExtensions.StripAlternativeV2(sourceString + random.Next());
+            Common.StringExtensions.StripAlternative(sourceString + random.Next());
+            //StringExtensions.StripAlternativeV2(sourceString + random.Next());
 
             //classic replace method with tolowercase
-            Func<string> altStrip = () => StringExtensions.StripAlternative(sourceString + random.Next());
+            Func<string> altStrip = () => Common.StringExtensions.StripAlternative(sourceString + random.Next());
 
-            Func<string> altv2String = () => StringExtensions.StripAlternativeV2(sourceString + random.Next());
+            //Func<string> altv2String = () => StringExtensions.StripAlternativeV2(sourceString + random.Next());
 
-            var numberOfTimesToExecute = 10000;
+            var numberOfTimesToExecute = 1000000;
             TimeSpan altv1Timing = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, altStrip);
-            TimeSpan altv2Timing = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, altv2String);
+            //TimeSpan altv2Timing = ExecuteMethodAndReturnTimings(numberOfTimesToExecute, altv2String);
 
             Console.WriteLine("Alt timing:  " + altv1Timing.TotalMilliseconds);
-            Console.WriteLine("Altv2 timing: " + altv2Timing.TotalMilliseconds);
+            //Console.WriteLine("Altv2 timing: " + altv2Timing.TotalMilliseconds);
         }
 
         [Test]

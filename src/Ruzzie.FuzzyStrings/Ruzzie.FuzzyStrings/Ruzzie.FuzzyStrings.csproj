@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.1.0.120" />
-    <PackageReference Include="Ruzzie.Common" Version="4.2.0.85" />
+    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.2.0.123" />
+    <PackageReference Include="Ruzzie.Common" Version="5.0.0.90" />
   </ItemGroup>
 
   <PropertyGroup>

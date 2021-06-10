@@ -423,5 +423,23 @@ namespace Ruzzie.FuzzyStrings.UnitTests
             //TODO: Change this to alternative Algorithm when needed
             Assert.That(a.Contains(b), Is.EqualTo(expectedResult));
         }
+
+
+        [TestCase(1,  2, 3,  1)]
+        [TestCase(3,  2, 1,  1)]
+        [TestCase(3,  1, 2,  1)]
+        [TestCase(3,  3, 2,  2)]
+        [TestCase(2,  3, 3,  2)]
+        [TestCase(3,  2, 3,  2)]
+        [TestCase(0,  0, 0,  0)]
+        [TestCase(0,  0, -1, -1)]
+        [TestCase(0,  0, -1, -1)]
+        [TestCase(-1, 0, -1, -1)]
+        [TestCase(1,  0, -1, -1)]
+        [TestCase(1,  1, 1,  1)]
+        public void LevenshteinDistanceExtensions_FindMinimumOptimized(int a, int b, int c, int expected)
+        {
+            Assert.That(LevenshteinDistanceExtensions.Min(a, b, c), Is.EqualTo(expected));
+        }
     }
 }
