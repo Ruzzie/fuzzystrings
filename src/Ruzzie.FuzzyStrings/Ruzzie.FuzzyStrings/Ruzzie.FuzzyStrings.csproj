@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <Description>A collection of fuzzy string algorithms for .net</Description>
-    <Copyright>Copyright © Dorus Verhoeckx 2021</Copyright>
+    <Copyright>Copyright © Dorus Verhoeckx 2023</Copyright>
     <AssemblyTitle>Ruzzie.FuzzyStrings</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Dorus Verhoeckx</Authors>
     <Company>D Crafting</Company>
-    <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Ruzzie.FuzzyStrings</AssemblyName>
@@ -40,8 +40,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ruzzie.Cache.FlashCache" Version="4.3.0.125" />
-    <PackageReference Include="Ruzzie.Common" Version="6.0.1.101" />
+    <PackageReference Include="Ruzzie.Common" Version="7.0.0.113" />
   </ItemGroup>
 
   <PropertyGroup>

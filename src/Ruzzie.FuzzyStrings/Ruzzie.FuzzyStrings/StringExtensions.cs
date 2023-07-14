@@ -1,12 +1,12 @@
 ﻿using System;
-using Ruzzie.Caching;
+using Ruzzie.Common.Caching;
 
 namespace Ruzzie.FuzzyStrings
 {
     public static class StringExtensions
     {
-        private static readonly IFixedSizeCache<string, double> Cache =
-            new FlashCacheWithPool<string, double>(InternalVariables.StringComparerForCacheKey, (InternalVariables.MaxCacheSizeInMb * 1024 * 1024) / InternalVariables.AverageStringSizeInBytes);
+        private static readonly FlashCache<string, double> Cache =
+            new FlashCache<string, double>(InternalVariables.StringComparerForCacheKey, (InternalVariables.MaxCacheSizeInMb * 1024 * 1024) / InternalVariables.AverageStringSizeInBytes);
 
         public const double ExactMatchProbability = 0.99999899999999997d;
         public const double FuzzyMatchMaxProbability = 0.99998899999999997d;
@@ -85,7 +85,7 @@ namespace Ruzzie.FuzzyStrings
 
         public static double FuzzyMatch(this string strA, string strB, bool caseSensitive = true)
         {
-            return Cache.GetOrAdd(string.Concat(strA, strB, caseSensitive), key => strA.FuzzyMatchUncached(strB, caseSensitive));
+            return Cache.GetOrAdd(string.Concat(strA, strB, caseSensitive.ToString()), key => strA.FuzzyMatchUncached(strB, caseSensitive));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Ruzzie.FuzzyStrings
         /// <remarks>This only works if the caller has already upperCased the strings</remarks>
         public static double FuzzyMatchAlreadyUpperCasedStrings(this string strAUpperCase, string strBUppercase)
         {
-            return Cache.GetOrAdd(string.Concat(strAUpperCase, strBUppercase, true, true),
+            return Cache.GetOrAdd(string.Concat(strAUpperCase, strBUppercase, true.ToString(), true.ToString()),
                 key => strAUpperCase.FuzzyMatchAlreadyUpperCasedStringsUncached(strBUppercase));
         }
 
@@ -192,19 +192,7 @@ namespace Ruzzie.FuzzyStrings
             var singleComposite = CompositeCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
             return singleComposite < 0.999999 ? singleComposite : FuzzyMatchMaxProbability; //fudge factor
         }
-
-
-        /// <summary>
-        /// Strips string of characters that are not [^a-zA-Z0-9 -]*
-        /// </summary>
-        /// <param name="str">The string to strip</param>
-        /// <returns>The stripped string</returns>
-        [Obsolete("Please use Ruzzie.Common.StringExtensions.StripAlternative. This method is moved to that library.", true)]
-        public static string StripAlternative(ReadOnlySpan<char> str)
-        {
-            return Common.StringExtensions.StripAlternative(str);
-        }
-
+        
         public static bool AnyString(this string input, string stringToFind, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             if (comparison == StringComparison.OrdinalIgnoreCase)
