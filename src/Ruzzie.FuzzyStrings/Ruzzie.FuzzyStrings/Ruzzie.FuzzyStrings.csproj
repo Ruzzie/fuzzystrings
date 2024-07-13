@@ -7,7 +7,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Dorus Verhoeckx</Authors>
     <Company>D Crafting</Company>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Ruzzie.FuzzyStrings</AssemblyName>
@@ -40,7 +40,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ruzzie.Common" Version="7.0.0.113" />
+    <PackageReference Include="Ruzzie.Common" Version="7.0.0.115" />
   </ItemGroup>
 
   <PropertyGroup>

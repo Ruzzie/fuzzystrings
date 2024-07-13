@@ -399,7 +399,8 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         {
             var result = input.LevenshteinDistance(match);
             var msg = $"LevenshteinDistance of \"{match}\" against \"{input}\" was {result}, expecting {expectedResult}.";
-            Assert.AreEqual(expectedResult, result, double.Epsilon, msg);
+
+            Assert.That(expectedResult, Is.EqualTo(result).Within(double.Epsilon), msg);
         }
 
         [Theory]
