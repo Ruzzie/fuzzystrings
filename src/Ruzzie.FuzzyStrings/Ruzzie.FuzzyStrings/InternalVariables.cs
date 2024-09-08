@@ -34,10 +34,15 @@ namespace Ruzzie.FuzzyStrings
                 DefaultCacheItemSizeInMb = Math.Max(1, mbOfMemoryAvailable   / 400L);
                 MaxCacheSizeInMb         = Math.Max(DefaultCacheItemSizeInMb * 2, mbOfMemoryAvailable / 8);
 
-                MaxNumberOfStringsInCache = Math.Min(Array.MaxLength
-                                                   , Math.Max(1024, (int)(MaxCacheSizeInMb * 1024L * 1024L) /
-                                                                    AverageStringSizeInBytes));
+                MaxNumberOfStringsInCache = CalculateMaxNumberOfStrings(MaxCacheSizeInMb, AverageStringSizeInBytes);
             }
+        }
+
+        internal static int CalculateMaxNumberOfStrings(long maxCacheSizeInMb, int averageStringSizeInBytes)
+        {
+            var maxNumberOfStringUnclamped =
+                Math.Max(1024L, (Math.Min(4096, maxCacheSizeInMb) * 1024L * 1024L)) / averageStringSizeInBytes;
+            return (int)Math.Clamp(maxNumberOfStringUnclamped, 1024, Array.MaxLength / 4096);
         }
     }
 }
