@@ -6,7 +6,7 @@ namespace Ruzzie.FuzzyStrings
     public static class StringExtensions
     {
         private static readonly FlashCache<string, double> Cache =
-            new FlashCache<string, double>(InternalVariables.StringComparerForCacheKey, (InternalVariables.MaxCacheSizeInMb * 1024 * 1024) / InternalVariables.AverageStringSizeInBytes);
+            new FlashCache<string, double>(InternalVariables.StringComparerForCacheKey,InternalVariables.MaxNumberOfStringsInCache);
 
         public const double ExactMatchProbability = 0.99999899999999997d;
         public const double FuzzyMatchMaxProbability = 0.99998899999999997d;
@@ -192,7 +192,7 @@ namespace Ruzzie.FuzzyStrings
             var singleComposite = CompositeCoefficient(localA, localB, caseSensitive, isAlreadyToUpper);
             return singleComposite < 0.999999 ? singleComposite : FuzzyMatchMaxProbability; //fudge factor
         }
-        
+
         public static bool AnyString(this string input, string stringToFind, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             if (comparison == StringComparison.OrdinalIgnoreCase)

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>A collection of fuzzy string algorithms for .net</Description>
-    <Copyright>Copyright © Dorus Verhoeckx 2023</Copyright>
+    <Copyright>Copyright © Dorus Verhoeckx 2024</Copyright>
     <AssemblyTitle>Ruzzie.FuzzyStrings</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Dorus Verhoeckx</Authors>
