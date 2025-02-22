@@ -21,15 +21,15 @@ namespace Ruzzie.FuzzyStrings
         public static char[] ToDoubleMetaphone(this string input, bool isAlreadyToUpper = false)
         {
             char[] buffer = new char[4];
-            int length;
+            int charsWritten;
             unsafe
             {
                 fixed (char* bufferPtr = buffer)
                 {
-                    ToDoubleMetaphoneUncached(input, isAlreadyToUpper, bufferPtr, out length);
+                    ToDoubleMetaphoneUncached(input, isAlreadyToUpper, bufferPtr, out charsWritten);
                 }
             }
-            Array.Resize(ref buffer, length);
+            Array.Resize(ref buffer, charsWritten);
             return buffer;
         }
 
@@ -105,7 +105,7 @@ namespace Ruzzie.FuzzyStrings
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static char CharAtOrReturnSpaceWhenOutOfRange(in string value, int index)
+        private static char CharAtOrReturnSpaceWhenOutOfRange(in string value, int index)
         {
             if (index < value.Length)
             {
@@ -114,7 +114,8 @@ namespace Ruzzie.FuzzyStrings
 
             return ' ';
         }
-        static unsafe bool IsSlavoGermanic(char* inputPtr, int inputLength)
+
+        private static unsafe bool IsSlavoGermanic(char* inputPtr, int inputLength)
         {
             fixed (char* czPtr = strCZ, witzPtr = strWITZ)
             {
@@ -141,7 +142,7 @@ namespace Ruzzie.FuzzyStrings
 
 
         //Don't use this struct, it is only used in this specialized edge case for perf. (Yes perf, was tested and profiled).
-        unsafe struct MetaphoneBuffer
+        private unsafe struct MetaphoneBuffer
         {
             public readonly char* Primary;
             public int PrimaryIndex;
@@ -1135,7 +1136,7 @@ namespace Ruzzie.FuzzyStrings
             return current;
         }
 
-        static bool IsVowel(this char self)
+        private static bool IsVowel(this char self)
         {
             return (self == charA) || (self == charE) || (self == charI)
                 || (self == charO) || (self == charU) || (self == charY);
@@ -1341,7 +1342,7 @@ namespace Ruzzie.FuzzyStrings
             }
         }
 
-        static bool StringAt(this string self, int startIndex, string a, string b, string c)
+        private static bool StringAt(this string self, int startIndex, string a, string b, string c)
         {
             if (startIndex < 0)
             {
@@ -1364,32 +1365,32 @@ namespace Ruzzie.FuzzyStrings
             return StringAt(self, startIndex, a) || StringAt(self, startIndex, b);
         }
 
-        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d)
+        private static bool StringAt(this string self, int startIndex, string a, string b, string c, string d)
         {
             return StringAt(self, startIndex, a, b) || StringAt(self, startIndex, c, d);
         }
 
-        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e)
+        private static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e)
         {
             return StringAt(self, startIndex, a, b, c) || StringAt(self, startIndex, d, e);
         }
 
-        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f)
+        private static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f)
         {
             return StringAt(self, startIndex, a, b, c) || StringAt(self, startIndex, d, e, f);
         }
 
-        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h)
+        private static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h)
         {
             return StringAt(self, startIndex, a, b, c, d) || StringAt(self, startIndex, e, f, g, h);
         }
 
-        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h, string i, string j)
+        private static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h, string i, string j)
         {
             return StringAt(self, startIndex, a, b, c, d) || StringAt(self, startIndex, e, f, g, h) || StringAt(self, startIndex, i, j);
         }
 
-        static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h, string i, string j, string k)
+        private static bool StringAt(this string self, int startIndex, string a, string b, string c, string d, string e, string f, string g, string h, string i, string j, string k)
         {
             return StringAt(self, startIndex, a, b, c, d) || StringAt(self, startIndex, e, f, g, h) || StringAt(self, startIndex, i, j, k);
         }
@@ -1578,7 +1579,7 @@ namespace Ruzzie.FuzzyStrings
             return foundChar;
         }
 
-        readonly unsafe struct CharAtSearchTupleValues
+        private readonly unsafe struct CharAtSearchTupleValues
         {
             public readonly char* ValueAPtr;
             public readonly int ValueALength;
@@ -1594,7 +1595,7 @@ namespace Ruzzie.FuzzyStrings
             }
         }
 
-        readonly unsafe struct CharAtSearchTripleValues
+        private readonly unsafe struct CharAtSearchTripleValues
         {
             public readonly char* ValueAPtr;
             public readonly int ValueALength;

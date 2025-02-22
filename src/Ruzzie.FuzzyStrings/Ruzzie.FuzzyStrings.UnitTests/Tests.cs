@@ -135,7 +135,7 @@ namespace Ruzzie.FuzzyStrings.UnitTests
         [TestCase("{G}", "B", 1, false)]
         [TestCase("", "B", 0, false)]
         [TestCase("", "", 0, true)]
-        //[TestCase("A string original", "original", 0, false)] //NOTE: this differs with the original implementation (which i consider a bug)
+        [TestCase("A string original", "original", 0, false)] //NOTE: this differs with the original implementation (which I consider a bug)
         [TestCase("very much", "very much longer and longer", 0, false)]
         [TestCase("very much longer", "very much longer and longer", 5, false)]
         public void StringAtOneParamTests(string input, string stringAt, int atIndex, bool expectedResult)

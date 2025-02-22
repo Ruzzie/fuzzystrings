@@ -126,7 +126,7 @@ namespace Ruzzie.FuzzyStrings
                 new string(subSequence, inputLength - subsequenceLength, subsequenceLength), coefficient);
         }
 
-        static readonly LongestCommonSubsequenceResult EmptyResult = default(LongestCommonSubsequenceResult);
+        private static readonly LongestCommonSubsequenceResult EmptyResult = default(LongestCommonSubsequenceResult);
 
         /// <summary>
         ///     Longest Common Subsequence. A good value is greater than 0.33.
@@ -136,7 +136,7 @@ namespace Ruzzie.FuzzyStrings
         /// <param name="caseSensitive"></param>
         /// <param name="includeLongestSubsequenceInResult"></param>
         /// <param name="alreadyUpperCased">Indicates if the input and comparedTo string are already upperCased.</param>
-        /// <returns>Returns a Tuple of the sub sequence string and the match coefficient.</returns>
+        /// <returns>Returns a Tuple of the sub-sequence string and the match coefficient.</returns>
         public static LongestCommonSubsequenceResult LongestCommonSubsequenceUncached(this string input,
             string comparedTo,
             bool caseSensitive = false,

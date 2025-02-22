@@ -27,7 +27,7 @@ namespace Ruzzie.FuzzyStrings
                 var matches = 0;
                 fixed (char* inputPtr = input, comparedToPtr = comparedTo)
                 {
-                    //Check if the the first and / or last chars are the same if so increment match
+                    //Check if the first and / or last chars are the same if so increment match
                     // we do this so no string concatenation with the SinglePercent + input + SinglePound is needed on the input string
                     if (*inputPtr == *comparedToPtr)
                     {
